@@ -17,7 +17,7 @@ export default async function MainLayout({
     <div className="relative flex min-h-screen flex-col">
       <Header user={user} />
       <main className="flex-1">
-        <div className="container mx-auto py-6 px-4">{children}</div>
+        <div className="container max-w-4xl mx-auto py-6 px-4">{children}</div>
       </main>
     </div>
   );

@@ -14,7 +14,7 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center mx-auto px-4">
+      <div className="container max-w-4xl flex h-14 items-center mx-auto px-4">
         <div className="mr-4 flex">
           <Link href="/sections" className="flex items-center space-x-2">
             <Image
