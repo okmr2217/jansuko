@@ -47,15 +47,40 @@ Supabase CLIを利用する。
 
 |#|タスク|詳細|
 |---|---|---|
-|2-1|usersテーブル作成|id, display_name, password_hash, is_admin, created_at, updated_at|
+|2-1|usersテーブル作成|id, display_name, password_hash, is_admin, created_at, updated_at, deleted_at（論理削除用）|
 |2-2|sectionsテーブル作成|id, name, starting_points, return_points, rate, player_count, status, created_by, created_at, closed_at|
 |2-3|section_participantsテーブル作成|id, section_id, user_id, created_at|
 |2-4|gamesテーブル作成|id, section_id, game_number, created_at, updated_at|
 |2-5|scoresテーブル作成|id, game_id, user_id, points, created_at, updated_at|
-|2-6|外部キー制約設定|各テーブル間のリレーション設定|
-|2-7|インデックス作成|検索・ソート用のインデックス設定|
+|2-6|外部キー制約設定|各テーブル間のリレーション設定（ユーザー削除は論理削除のためCASCADEなし）|
+|2-7|インデックス作成|必要最小限のインデックス（section_participants、scoresの外部キーのみ）|
 |2-8|RLSポリシー設定|行レベルセキュリティの設定|
 |2-9|初期データ投入|管理者ユーザーの作成|
+
+### 設計方針
+
+#### ユーザー削除について
+- **論理削除を採用**: `deleted_at`カラムで削除状態を管理
+- 削除されたユーザーのスコア履歴は保持される
+- 削除済みユーザーは一覧に表示されないが、過去のセクション・スコアには名前が残る
+
+#### 外部キー制約
+| 子テーブル | 外部キー | 親テーブル | 削除時の動作 |
+|---|---|---|---|
+| `sections` | `created_by` | `users.id` | `SET NULL` |
+| `section_participants` | `section_id` | `sections.id` | `CASCADE` |
+| `section_participants` | `user_id` | `users.id` | `RESTRICT`（論理削除のため物理削除不可） |
+| `games` | `section_id` | `sections.id` | `CASCADE` |
+| `scores` | `game_id` | `games.id` | `CASCADE` |
+| `scores` | `user_id` | `users.id` | `RESTRICT`（論理削除のため物理削除不可） |
+
+#### インデックス（必要最小限）
+- `section_participants(section_id)` - セクション参加者取得用
+- `section_participants(user_id)` - ユーザーの参加セクション取得用
+- `scores(game_id)` - ゲームのスコア取得用
+- `scores(user_id)` - ユーザーの統計計算用
+
+※ `sections.status`や`sections.created_at`へのインデックスは、データ量が増えて必要になった段階で追加
 
 ### 成果物
 
