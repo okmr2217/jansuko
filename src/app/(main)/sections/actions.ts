@@ -8,7 +8,12 @@ import {
   closeSection,
   deleteSection,
 } from "@/lib/db/mutations/sections";
-import { isSectionCreator } from "@/lib/db/queries/sections";
+import {
+  isSectionCreator,
+  getSections,
+  GetSectionsOptions,
+  SectionListItem,
+} from "@/lib/db/queries/sections";
 import { createSectionSchema, updateSectionSchema } from "@/lib/validations/section";
 
 export interface ActionResult {
@@ -175,4 +180,13 @@ export async function deleteSectionAction(
       error instanceof Error ? error.message : "エラーが発生しました";
     return { success: false, error: message };
   }
+}
+
+/**
+ * セクション一覧を取得する（リアルタイム更新用）
+ */
+export async function fetchSectionsAction(
+  options: GetSectionsOptions = {}
+): Promise<SectionListItem[]> {
+  return getSections(options);
 }
