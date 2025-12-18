@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { verifyPassword } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { loginSchema } from "@/lib/validations/auth";
 
 export interface LoginState {
   error?: string;
@@ -13,12 +14,18 @@ export async function login(
   _prevState: LoginState | null,
   formData: FormData
 ): Promise<LoginState | null> {
-  const displayName = formData.get("displayName") as string;
-  const password = formData.get("password") as string;
+  const rawData = {
+    displayName: formData.get("displayName") as string,
+    password: formData.get("password") as string,
+  };
 
-  if (!displayName || !password) {
-    return { error: "表示名とパスワードを入力してください" };
+  const result = loginSchema.safeParse(rawData);
+  if (!result.success) {
+    const firstError = result.error.issues[0];
+    return { error: firstError.message };
   }
+
+  const { displayName, password } = result.data;
 
   const supabase = createAdminClient();
 

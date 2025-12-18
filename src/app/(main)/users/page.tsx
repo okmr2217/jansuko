@@ -1,32 +1,23 @@
 import { getSession } from "@/lib/auth/session";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { getUsers } from "@/lib/db/queries/users";
+import { UserList } from "./_components/user-list";
+import { CreateUserDialog } from "./_components/create-user-dialog";
 
 export default async function UsersPage() {
-  const user = await getSession();
-  const isAdmin = user?.isAdmin ?? false;
+  const session = await getSession();
+  const isAdmin = session?.isAdmin ?? false;
+  const users = await getUsers();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">雀士一覧</h1>
-          <p className="text-muted-foreground">
-            登録されている雀士の管理
-          </p>
+          <p className="text-muted-foreground">登録されている雀士の管理</p>
         </div>
-        {isAdmin && (
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            雀士を追加
-          </Button>
-        )}
+        {isAdmin && <CreateUserDialog />}
       </div>
-      <div className="rounded-lg border border-dashed p-8 text-center">
-        <p className="text-muted-foreground">
-          フェーズ5で実装予定
-        </p>
-      </div>
+      <UserList users={users} isAdmin={isAdmin} currentUserId={session?.id} />
     </div>
   );
 }
