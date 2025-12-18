@@ -15,12 +15,12 @@ export function Header({ user }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container max-w-4xl flex h-14 items-center mx-auto px-4">
-        <div className="mr-4 flex">
+        <div className="mr-8 flex">
           <Link href="/sections" className="flex items-center space-x-2">
             <Image
-              src="/logo.png"
+              src="/logo-text-only.png"
               alt="じゃんスコ"
-              width={96}
+              width={128}
               height={32}
               priority
             />

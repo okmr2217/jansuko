@@ -22,7 +22,7 @@ export default function LoginPage() {
         <CardHeader className="space-y-1">
           <div className="flex justify-center">
             <Image
-              src="/logo.png"
+              src="/logo-text-only.png"
               alt="じゃんスコ"
               width={200}
               height={80}

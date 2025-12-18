@@ -8,8 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getUsers } from "@/lib/db/queries/users";
+import { CreateSectionForm } from "../_components/create-section-form";
 
-export default function NewSectionPage() {
+export default async function NewSectionPage() {
+  const users = await getUsers();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -36,9 +40,7 @@ export default function NewSectionPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            フェーズ6で実装予定
-          </p>
+          <CreateSectionForm users={users} />
         </CardContent>
       </Card>
     </div>

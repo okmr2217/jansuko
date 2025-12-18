@@ -44,7 +44,7 @@ export function MobileNav() {
   const drawerContent = isOpen ? (
     <>
       <div
-        className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden"
+        className="fixed inset-0 z-50 bg-background/20 backdrop-blur-sm md:hidden"
         onClick={() => setIsOpen(false)}
       />
       <div className="fixed top-0 right-0 bottom-0 z-50 w-3/4 max-w-sm bg-background p-6 shadow-lg md:hidden">
