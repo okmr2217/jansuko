@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PageHeader } from "@/components/common/page-header";
 import {
   Card,
@@ -6,70 +7,95 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getSession } from "@/lib/auth/session";
+import { getStats, DateRange } from "@/lib/db/queries/stats";
+import { PeriodSelector, PeriodType } from "./_components/period-selector";
+import { StatsCards } from "./_components/stats-cards";
+import { UsersRankingTable } from "./_components/users-ranking-table";
 
-export default function StatsPage() {
+interface StatsPageProps {
+  searchParams: Promise<{
+    period?: string;
+    from?: string;
+    to?: string;
+  }>;
+}
+
+function StatsLoading() {
   return (
     <div className="space-y-6">
-      <PageHeader title="📈 統計" description="雀士の生成器統計と分析" />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>勝率</CardDescription>
-            <CardTitle className="text-3xl">--%</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              1位の割合
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>平均順位</CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              全ゲームの平均
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>通算収支</CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              精算額の合計
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>参加ゲーム数</CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              累計ゲーム数
-            </p>
-          </CardContent>
-        </Card>
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-8 w-24" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-3 w-32" />
+            </CardContent>
+          </Card>
+        ))}
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>詳細統計</CardTitle>
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-4 w-48" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+async function StatsContent({ from, to }: { from?: string; to?: string }) {
+  const user = await getSession();
+
+  // 期間をDateRangeに変換
+  const dateRange: DateRange | undefined =
+    from || to ? { from, to } : undefined;
+
+  const stats = await getStats(dateRange);
+
+  return (
+    <>
+      <StatsCards stats={stats} currentUserId={user?.id} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>雀士ランキング</CardTitle>
           <CardDescription>
-            期間別の統計データ
+            {stats.totalSections}セクション / {stats.totalGames}ゲームの統計
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            フェーズ8で実装予定
-          </p>
+          <UsersRankingTable stats={stats} currentUserId={user?.id} />
         </CardContent>
       </Card>
+    </>
+  );
+}
+
+export default async function StatsPage({ searchParams }: StatsPageProps) {
+  const params = await searchParams;
+  const period = (params.period as PeriodType) || "all";
+  const from = params.from;
+  const to = params.to;
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="統計" description="雀士の成績統計と分析" />
+      <PeriodSelector period={period} from={from} to={to} />
+      <Suspense fallback={<StatsLoading />}>
+        <StatsContent from={from} to={to} />
+      </Suspense>
     </div>
   );
 }
