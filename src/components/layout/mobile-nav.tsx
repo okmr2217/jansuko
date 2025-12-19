@@ -4,7 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutGrid, Users, BarChart3, X } from "lucide-react";
+import { Menu, LayoutGrid, Users, BarChart3, HelpCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,11 @@ const navItems = [
     title: "統計",
     href: "/stats",
     icon: BarChart3,
+  },
+  {
+    title: "ヘルプ",
+    href: "/help",
+    icon: HelpCircle,
   },
 ];
 

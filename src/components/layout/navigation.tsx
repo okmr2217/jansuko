@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Users, BarChart3 } from "lucide-react";
+import { LayoutGrid, Users, BarChart3, HelpCircle } from "lucide-react";
 
 const navItems = [
   {
@@ -20,6 +20,11 @@ const navItems = [
     title: "統計",
     href: "/stats",
     icon: BarChart3,
+  },
+  {
+    title: "ヘルプ",
+    href: "/help",
+    icon: HelpCircle,
   },
 ];
 
