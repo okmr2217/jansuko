@@ -68,6 +68,9 @@ export async function getSections(
     )
     .order("created_at", { ascending: sortOrder === "asc" });
 
+  // 論理削除されていないセクションのみ取得
+  query = query.is("deleted_at", null);
+
   // ステータスフィルター
   if (status) {
     query = query.eq("status", status);
@@ -142,6 +145,7 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
     `
     )
     .eq("id", id)
+    .is("deleted_at", null)
     .single();
 
   if (error) {
@@ -218,6 +222,7 @@ export async function isSectionCreator(
     .from("sections")
     .select("created_by")
     .eq("id", sectionId)
+    .is("deleted_at", null)
     .single();
 
   if (error) {

@@ -7,6 +7,7 @@ import {
   updateSection,
   closeSection,
   deleteSection,
+  reopenSection,
 } from "@/lib/db/mutations/sections";
 import {
   isSectionCreator,
@@ -173,6 +174,33 @@ export async function deleteSectionAction(
 
     await deleteSection(sectionId);
 
+    revalidatePath("/sections");
+    return { success: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "エラーが発生しました";
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * セクションを再開する（終了→進行中に戻す）
+ */
+export async function reopenSectionAction(
+  sectionId: string
+): Promise<ActionResult> {
+  try {
+    const user = await requireAuth();
+
+    // 作成者チェック
+    const isCreator = await isSectionCreator(sectionId, user.id);
+    if (!isCreator && !user.isAdmin) {
+      return { success: false, error: "再開する権限がありません" };
+    }
+
+    await reopenSection(sectionId);
+
+    revalidatePath(`/sections/${sectionId}`);
     revalidatePath("/sections");
     return { success: true };
   } catch (error) {

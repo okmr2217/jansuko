@@ -28,7 +28,10 @@ export default async function SectionsPage({ searchParams }: SectionsPageProps) 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader title="🀄 セクション一覧" description="麻雀セクションの管理と点数記録" />
+        <PageHeader
+          title="🀄 セクション一覧"
+          description="麻雀セクションの管理と点数記録。進行中のセクションは点数の入力・修正・削除が可能、終了したセクションは閲覧のみ"
+        />
         <div>
           <Button asChild>
             <Link href="/sections/new">

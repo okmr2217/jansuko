@@ -124,6 +124,7 @@ export type Database = {
           closed_at: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           id: string
           name: string
           player_count: number
@@ -136,6 +137,7 @@ export type Database = {
           closed_at?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           name: string
           player_count?: number
@@ -148,6 +150,7 @@ export type Database = {
           closed_at?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           name?: string
           player_count?: number

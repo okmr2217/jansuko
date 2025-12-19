@@ -127,18 +127,41 @@ export async function closeSection(id: string): Promise<void> {
 }
 
 /**
- * セクションを削除する
+ * セクションを削除する（論理削除）
  */
 export async function deleteSection(id: string): Promise<void> {
   const supabase = createAdminClient();
 
-  // 関連するgames, section_participantsはCASCADEで削除される
   const { error } = await supabase
     .from("sections")
-    .delete()
-    .eq("id", id);
+    .update({
+      deleted_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .is("deleted_at", null);
 
   if (error) {
     throw new Error(`セクションの削除に失敗しました: ${error.message}`);
+  }
+}
+
+/**
+ * セクションを再開する（終了→進行中に戻す）
+ */
+export async function reopenSection(id: string): Promise<void> {
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("sections")
+    .update({
+      status: "active",
+      closed_at: null,
+    })
+    .eq("id", id)
+    .eq("status", "closed")
+    .is("deleted_at", null);
+
+  if (error) {
+    throw new Error(`セクションの再開に失敗しました: ${error.message}`);
   }
 }

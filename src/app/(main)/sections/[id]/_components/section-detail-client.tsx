@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Settings, Lock, Pencil, Users, Trash2 } from "lucide-react";
+import { Plus, Settings, Lock, Unlock, Pencil, Users, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { SectionListItem } from "@/lib/db/queries/sections";
 import { GameWithScores } from "@/lib/db/queries/games";
@@ -25,6 +25,7 @@ import { ScoreInputForm } from "./score-input-form";
 import { SectionEditDialog } from "./section-edit-dialog";
 import { DeleteGameDialog } from "./delete-game-dialog";
 import { CloseSectionDialog } from "./close-section-dialog";
+import { ReopenSectionDialog } from "./reopen-section-dialog";
 import { DeleteSectionDialog } from "./delete-section-dialog";
 import {
   createGameAction,
@@ -35,6 +36,7 @@ import {
 import {
   updateSectionAction,
   closeSectionAction,
+  reopenSectionAction,
   deleteSectionAction,
 } from "../../actions";
 
@@ -58,6 +60,7 @@ export function SectionDetailClient({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
+  const [isReopenDialogOpen, setIsReopenDialogOpen] = useState(false);
   const [isDeleteSectionDialogOpen, setIsDeleteSectionDialogOpen] = useState(false);
 
   // 編集中・削除中のゲーム
@@ -69,6 +72,7 @@ export function SectionDetailClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [isReopening, setIsReopening] = useState(false);
   const [isDeletingSection, setIsDeletingSection] = useState(false);
 
   // 権限チェック
@@ -249,6 +253,31 @@ export function SectionDetailClient({
     }
   };
 
+  // セクションを再開
+  const handleReopenSection = async () => {
+    setIsReopening(true);
+    try {
+      const result = await reopenSectionAction(section.id);
+
+      if (result.success) {
+        toast.success("セクションを再開しました");
+        setIsReopenDialogOpen(false);
+        setCurrentSection((prev) => ({
+          ...prev,
+          status: "active" as const,
+          closedAt: null,
+        }));
+        router.refresh();
+      } else {
+        toast.error(result.error || "再開に失敗しました");
+      }
+    } catch {
+      toast.error("再開に失敗しました");
+    } finally {
+      setIsReopening(false);
+    }
+  };
+
   // セクションを削除
   const handleDeleteSection = async () => {
     setIsDeletingSection(true);
@@ -313,6 +342,15 @@ export function SectionDetailClient({
             >
               <Lock className="h-4 w-4 mr-2" />
               終了
+            </Button>
+          )}
+          {!isActive && canDelete && (
+            <Button
+              variant="outline"
+              onClick={() => setIsReopenDialogOpen(true)}
+            >
+              <Unlock className="h-4 w-4 mr-2" />
+              再開
             </Button>
           )}
           {canDelete && (
@@ -447,6 +485,14 @@ export function SectionDetailClient({
         onOpenChange={setIsCloseDialogOpen}
         onConfirm={handleCloseSection}
         isClosing={isClosing}
+      />
+
+      <ReopenSectionDialog
+        sectionName={currentSection.name}
+        open={isReopenDialogOpen}
+        onOpenChange={setIsReopenDialogOpen}
+        onConfirm={handleReopenSection}
+        isReopening={isReopening}
       />
 
       <DeleteSectionDialog
