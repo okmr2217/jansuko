@@ -56,7 +56,7 @@ sheetNames.forEach(async (sheetName) => {
   const participantIds = participantNames.map((name) => getUserIdByName(users, name)!);
 
   const section: CreateSectionInput = {
-    name: `${sheetName} (${getDefaultName(date)})`,
+    name: sheetName,
     startingPoints: startingPoints,
     returnPoints: startingPoints,
     rate: rate,
