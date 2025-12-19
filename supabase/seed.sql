@@ -9,7 +9,7 @@
 
 INSERT INTO users (display_name, password_hash, is_admin)
 VALUES (
-  'admin',
+  'だいち',
   '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu',
   TRUE
 )
@@ -21,10 +21,11 @@ ON CONFLICT DO NOTHING;
 -- コメントアウトを外すとテストユーザーが追加されます
 -- パスワード: password
 
--- INSERT INTO users (display_name, password_hash, is_admin)
--- VALUES
---   ('田中', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
---   ('佐藤', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
---   ('鈴木', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
---   ('高橋', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE)
--- ON CONFLICT DO NOTHING;
+INSERT INTO users (display_name, password_hash, is_admin)
+VALUES
+  ('えいご', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
+  ('おうた', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
+  ('かいと', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
+  ('きむら', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE),
+  ('たくむ', '$2b$10$qBcUAykKGGkUFj0FIs8WquXwM7oXq1q7WsmeFSY.shOKhcOARTpyu', FALSE)
+ON CONFLICT DO NOTHING;
