@@ -1,20 +1,15 @@
-"use client";
-
-import { useActionState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import { login } from "../actions";
+import { getUsers } from "@/lib/db/queries/users";
+import { LoginForm } from "./login-form";
 
-export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState(login, null);
+export default async function LoginPage() {
+  const users = await getUsers();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
@@ -38,42 +33,11 @@ export default function LoginPage() {
             <h1 className="text-3xl font-extrabold">じゃん<span className="text-primary">スコ</span></h1>
           </div>
           <CardDescription className="text-center">
-            表示名とパスワードでログイン
+            雀士とパスワードでログイン
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={formAction} className="space-y-6">
-            {state?.error && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                {state.error}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="displayName">表示名</Label>
-              <Input
-                id="displayName"
-                name="displayName"
-                type="text"
-                placeholder="表示名を入力"
-                required
-                autoComplete="username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">パスワード</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="パスワードを入力"
-                required
-                autoComplete="current-password"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "ログイン中..." : "ログイン"}
-            </Button>
-          </form>
+          <LoginForm users={users} />
         </CardContent>
       </Card>
     </div>

@@ -21,7 +21,7 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="アカウント設定"
+        title="⚙️ アカウント設定"
         description="アカウント情報の確認と変更"
       />
       <div className="grid gap-6">
