@@ -6,18 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PageHeader } from "@/components/common/page-header";
 
 export default async function SettingsPage() {
   const user = await getSession();
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">アカウント設定</h1>
-        <p className="text-muted-foreground">
-          アカウント情報の確認と変更
-        </p>
-      </div>
+      <PageHeader title="⚙️ アカウント設定" description="アカウント情報の確認と変更" />
       <div className="grid gap-6">
         <Card>
           <CardHeader>

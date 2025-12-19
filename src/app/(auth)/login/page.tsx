@@ -17,17 +17,25 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(login, null);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
+      <Image
+        src="/login-background.png"
+        alt=""
+        fill
+        className="object-cover -z-10 md:hidden"
+        priority
+      />
+      <Image
+        src="/login-background-md.png"
+        alt=""
+        fill
+        className="object-cover -z-10 hidden md:block"
+        priority
+      />
+      <Card className="w-full max-w-sm bg-background/90 backdrop-blur">
         <CardHeader className="space-y-1">
           <div className="flex justify-center">
-            <Image
-              src="/logo-text-only.png"
-              alt="じゃんスコ"
-              width={200}
-              height={80}
-              priority
-            />
+            <h1 className="text-3xl font-extrabold">じゃん<span className="text-primary">スコ</span></h1>
           </div>
           <CardDescription className="text-center">
             表示名とパスワードでログイン

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/common/page-header";
 import {
   Card,
   CardContent,
@@ -9,12 +10,7 @@ import {
 export default function StatsPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">統計</h1>
-        <p className="text-muted-foreground">
-          雀士の成績統計と分析
-        </p>
-      </div>
+      <PageHeader title="📈 統計" description="雀士の生成器統計と分析" />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">

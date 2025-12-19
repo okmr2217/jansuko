@@ -14,16 +14,10 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container max-w-4xl flex h-14 items-center mx-auto px-4">
+      <div className="container max-w-3xl flex h-14 items-center mx-auto px-4">
         <div className="mr-8 flex">
           <Link href="/sections" className="flex items-center space-x-2">
-            <Image
-              src="/logo-text-only.png"
-              alt="じゃんスコ"
-              width={128}
-              height={32}
-              priority
-            />
+            <h1 className="text-2xl font-extrabold">じゃん<span className="text-primary">スコ</span></h1>
           </Link>
         </div>
         <div className="hidden md:flex md:flex-1">
