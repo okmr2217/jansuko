@@ -1,13 +1,11 @@
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { getSession } from "@/lib/auth/session";
+import { getSection } from "@/lib/db/queries/sections";
+import { getGamesWithScores } from "@/lib/db/queries/games";
+import { SectionDetailClient } from "./_components/section-detail-client";
 
 export default async function SectionDetailPage({
   params,
@@ -15,6 +13,21 @@ export default async function SectionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  // セッションを取得
+  const user = await getSession();
+  if (!user) {
+    redirect("/login");
+  }
+
+  // セクションを取得
+  const section = await getSection(id);
+  if (!section) {
+    notFound();
+  }
+
+  // ゲーム一覧を取得
+  const games = await getGamesWithScores(id);
 
   return (
     <div className="space-y-6">
@@ -25,26 +38,13 @@ export default async function SectionDetailPage({
             <span className="sr-only">戻る</span>
           </Link>
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            セクション詳細
-          </h1>
-          <p className="text-muted-foreground">ID: {id}</p>
-        </div>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>スコアボード</CardTitle>
-          <CardDescription>
-            ゲームごとの点数を記録・表示します
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            フェーズ7で実装予定
-          </p>
-        </CardContent>
-      </Card>
+
+      <SectionDetailClient
+        section={section}
+        initialGames={games}
+        user={user}
+      />
     </div>
   );
 }

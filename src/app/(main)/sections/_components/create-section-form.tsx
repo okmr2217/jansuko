@@ -230,6 +230,9 @@ export function CreateSectionForm({ users }: CreateSectionFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>返し点</FormLabel>
+                <FormDescription>
+                  順位点計算の基準となる点数
+                </FormDescription>
                 <Select
                   onValueChange={(value) => field.onChange(Number(value))}
                   value={field.value.toString()}
