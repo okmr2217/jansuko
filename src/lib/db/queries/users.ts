@@ -92,3 +92,26 @@ export async function getUserByDisplayName(
     updatedAt: data.updated_at,
   };
 }
+
+/**
+ * ユーザーのパスワードハッシュを取得する（パスワード検証用）
+ */
+export async function getUserPasswordHash(id: string): Promise<string | null> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("password_hash")
+    .eq("id", id)
+    .is("deleted_at", null)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      return null;
+    }
+    throw new Error(`パスワードの取得に失敗しました: ${error.message}`);
+  }
+
+  return data.password_hash;
+}
