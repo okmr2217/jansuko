@@ -30,12 +30,12 @@ export default async function SectionDetailPage({
   const games = await getGamesWithScores(id);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/sections">
+        <Button variant="outline" asChild>
+          <Link href="/sections" className="inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            <span className="sr-only">戻る</span>
+            一覧に戻る
           </Link>
         </Button>
       </div>

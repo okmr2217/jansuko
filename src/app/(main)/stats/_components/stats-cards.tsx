@@ -12,6 +12,28 @@ interface StatsCardsProps {
   currentUserId?: string;
 }
 
+function StatsCard({
+  description,
+  title,
+  content,
+}: {
+  description: string;
+  title: React.ReactNode;
+  content: string;
+}) {
+  return (
+    <Card className="gap-4">
+      <CardHeader>
+        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-3xl">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-xs text-muted-foreground">{content}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function StatsCards({ stats, currentUserId }: StatsCardsProps) {
   // ログインユーザーの統計を取得
   const currentUserStats = currentUserId
@@ -33,107 +55,53 @@ export function StatsCards({ stats, currentUserId }: StatsCardsProps) {
 
   if (!currentUserStats) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>勝率</CardDescription>
-            <CardTitle className="text-3xl">--%</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">1位の割合</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>平均順位</CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">全ゲームの平均</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>通算収支</CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">精算額の合計</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>参加ゲーム数</CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">累計ゲーム数</p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <StatsCard description="勝率" title="--%" content="1位の割合" />
+        <StatsCard description="平均順位" title="--" content="全ゲームの平均" />
+        <StatsCard description="通算収支" title="--" content="精算額の合計" />
+        <StatsCard
+          description="参加ゲーム数"
+          title="--"
+          content="累計ゲーム数"
+        />
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardDescription>勝率</CardDescription>
-          <CardTitle className="text-3xl">
-            {formatPercent(currentUserStats.winRate)}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground">
-            1位: {currentUserStats.winCount}回 / {currentUserStats.gameCount}ゲーム
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardDescription>平均順位</CardDescription>
-          <CardTitle className="text-3xl">
-            {formatRank(currentUserStats.averageRank)}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground">
-            1位:{currentUserStats.rankCounts.first} 2位:{currentUserStats.rankCounts.second} 3位:{currentUserStats.rankCounts.third} 4位:{currentUserStats.rankCounts.fourth}
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardDescription>通算収支</CardDescription>
-          <CardTitle
-            className={`text-3xl ${
+    <div className="grid gap-4 sm:grid-cols-2">
+      <StatsCard
+        description="勝率"
+        title={formatPercent(currentUserStats.winRate)}
+        content={`1位: ${currentUserStats.winCount}回 / ${currentUserStats.gameCount}ゲーム`}
+      />
+      <StatsCard
+        description="平均順位"
+        title={formatRank(currentUserStats.averageRank)}
+        content={`1位:${currentUserStats.rankCounts.first} 2位:${currentUserStats.rankCounts.second} 3位:${currentUserStats.rankCounts.third} 4位:${currentUserStats.rankCounts.fourth}`}
+      />
+      <StatsCard
+        description="通算収支"
+        title={
+          <span
+            className={
               currentUserStats.totalSettlement < 0
                 ? "text-red-600"
                 : currentUserStats.totalSettlement > 0
                 ? "text-green-600"
                 : ""
-            }`}
+            }
           >
             {formatCurrency(currentUserStats.totalSettlement)}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground">精算額の合計</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardDescription>参加ゲーム数</CardDescription>
-          <CardTitle className="text-3xl">
-            {currentUserStats.gameCount}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground">
-            {currentUserStats.sectionCount}セクション参加
-          </p>
-        </CardContent>
-      </Card>
+          </span>
+        }
+        content="精算額の合計"
+      />
+      <StatsCard
+        description="参加ゲーム数"
+        title={currentUserStats.gameCount}
+        content={`${currentUserStats.sectionCount}セクション参加`}
+      />
     </div>
   );
 }

@@ -3,7 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Settings, Lock, Unlock, Pencil, Users, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Settings,
+  Lock,
+  Unlock,
+  Pencil,
+  Users,
+  Trash2,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { SectionListItem } from "@/lib/db/queries/sections";
 import { GameWithScores } from "@/lib/db/queries/games";
@@ -11,13 +19,7 @@ import { SessionUser } from "@/lib/auth/session";
 import { ScoreInput } from "@/lib/validations/game";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScoreBoard } from "./score-board";
 import { SummaryPanel } from "./summary-panel";
@@ -39,6 +41,7 @@ import {
   reopenSectionAction,
   deleteSectionAction,
 } from "../../actions";
+import { ParticipantList } from "../../_components/participant-list";
 
 interface SectionDetailClientProps {
   section: SectionListItem;
@@ -53,7 +56,8 @@ export function SectionDetailClient({
 }: SectionDetailClientProps) {
   const router = useRouter();
   const [games, setGames] = useState<GameWithScores[]>(initialGames);
-  const [currentSection, setCurrentSection] = useState<SectionListItem>(section);
+  const [currentSection, setCurrentSection] =
+    useState<SectionListItem>(section);
 
   // モーダル状態
   const [isScoreFormOpen, setIsScoreFormOpen] = useState(false);
@@ -61,7 +65,8 @@ export function SectionDetailClient({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
   const [isReopenDialogOpen, setIsReopenDialogOpen] = useState(false);
-  const [isDeleteSectionDialogOpen, setIsDeleteSectionDialogOpen] = useState(false);
+  const [isDeleteSectionDialogOpen, setIsDeleteSectionDialogOpen] =
+    useState(false);
 
   // 編集中・削除中のゲーム
   const [editingGame, setEditingGame] = useState<GameWithScores | null>(null);
@@ -164,7 +169,9 @@ export function SectionDetailClient({
       }
 
       if (result.success) {
-        toast.success(editingGame ? "点数を更新しました" : "点数を追加しました");
+        toast.success(
+          editingGame ? "点数を更新しました" : "点数を追加しました"
+        );
         setIsScoreFormOpen(false);
         setEditingGame(null);
         await refreshGames();
@@ -298,24 +305,16 @@ export function SectionDetailClient({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* ヘッダー */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">
-              {currentSection.name}
-            </h1>
-            <Badge variant={isActive ? "default" : "secondary"}>
-              {isActive ? "進行中" : "終了"}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              {currentSection.participants.map((p) => p.displayName).join(", ")}
-            </span>
-          </div>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold tracking-tight">
+            {currentSection.name}
+          </h1>
+          <Badge variant={isActive ? "default" : "secondary"}>
+            {isActive ? "進行中" : "終了"}
+          </Badge>
         </div>
 
         <div className="flex items-center gap-2">
@@ -367,89 +366,75 @@ export function SectionDetailClient({
         </div>
       </div>
 
-      {/* タブ */}
-      <Tabs defaultValue="scoreboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="scoreboard">スコアボード</TabsTrigger>
-          <TabsTrigger value="summary">集計</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="scoreboard" className="mt-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">スコアボード</CardTitle>
-              <CardDescription>
-                ゲームごとの点数を記録・表示します
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScoreBoard
-                games={games}
-                participants={currentSection.participants}
-                isActive={isActive}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                onEditGame={handleEditGame}
-                onDeleteGame={handleDeleteGame}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="summary" className="mt-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">集計</CardTitle>
-              <CardDescription>
-                合計点・順位・精算額を表示します
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SummaryPanel
-                games={games}
-                participants={currentSection.participants}
-                startingPoints={currentSection.startingPoints}
-                returnPoints={currentSection.returnPoints}
-                rate={currentSection.rate}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
       {/* セクション情報 */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            セクション設定
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-            <div>
-              <span className="text-muted-foreground">開始点</span>
-              <p className="font-medium">{currentSection.startingPoints.toLocaleString()}点</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">返し点</span>
-              <p className="font-medium">{currentSection.returnPoints.toLocaleString()}点</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">レート</span>
-              <p className="font-medium">
-                {currentSection.rate === 0
-                  ? "ノーレート"
-                  : `¥${currentSection.rate}/1,000点`}
-              </p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">参加人数</span>
-              <p className="font-medium">{currentSection.playerCount}人</p>
-            </div>
+      <div className="bg-secondary text-secondary-foreground p-4 rounded-lg">
+        <div className="grid grid-cols-3 gap-y-3 md:grid-cols-6">
+          <div className="col-span-3">
+            <div className="text-sm text-muted-foreground">参加者</div>
+            <p className="text-lg font-medium">
+              {currentSection.participants.map((p) => p.displayName).join(", ")}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <div className="text-sm text-muted-foreground">開始点</div>
+            <p className="text-lg font-medium">
+              {currentSection.startingPoints.toLocaleString()}点
+            </p>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">返し点</div>
+            <p className="text-lg font-medium">
+              {currentSection.returnPoints.toLocaleString()}点
+            </p>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">レート</div>
+            <p className="text-lg font-medium">
+              {currentSection.rate === 0
+                ? "ノーレート"
+                : `¥${currentSection.rate}/1,000点`}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold tracking-tight">スコアボード</h2>
+          <p className="text-muted-foreground">
+            ゲームごとの点数を記録・表示します
+          </p>
+        </div>
+        <div className="mt-4">
+          <ScoreBoard
+            games={games}
+            participants={currentSection.participants}
+            isActive={isActive}
+            canEdit={canEdit}
+            canDelete={canDelete}
+            onEditGame={handleEditGame}
+            onDeleteGame={handleDeleteGame}
+          />
+        </div>
+      </div>
+
+      <div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold tracking-tight">累計</h2>
+          <p className="text-muted-foreground">
+            合計点・順位・精算額を表示します
+          </p>
+        </div>
+        <div className="mt-4">
+          <SummaryPanel
+            games={games}
+            participants={currentSection.participants}
+            startingPoints={currentSection.startingPoints}
+            returnPoints={currentSection.returnPoints}
+            rate={currentSection.rate}
+          />
+        </div>
+      </div>
 
       {/* ダイアログ */}
       <ScoreInputForm

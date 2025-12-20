@@ -10,7 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, Hash } from "lucide-react";
+import { Users, Calendar, Gamepad2 } from "lucide-react";
+import { ParticipantList } from "./participant-list";
 
 interface SectionListProps {
   sections: SectionListItem[];
@@ -32,41 +33,41 @@ export function SectionList({ sections, currentUserId }: SectionListProps) {
     <div className="grid gap-4 md:grid-cols-2">
       {sections.map((section) => (
         <Link key={section.id} href={`/sections/${section.id}`}>
-          <Card className="h-full transition-colors hover:bg-accent/50 gap-4">
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-xl">{section.name}</CardTitle>
+          <Card className="h-full overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50">
+            <CardHeader>
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-xl font-bold leading-tight transition-colors">
+                  {section.name}
+                </CardTitle>
                 <Badge
                   variant={section.status === "active" ? "default" : "secondary"}
                 >
                   {section.status === "active" ? "進行中" : "終了"}
                 </Badge>
               </div>
-              <CardDescription className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {new Date(section.createdAt).toLocaleDateString("ja-JP")}
+              <CardDescription className="flex items-center gap-2 text-xs">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{new Date(section.createdAt).toLocaleDateString("ja-JP")}</span>
                 {section.createdByName && (
-                  <span className="ml-2">作成者: {section.createdByName}</span>
+                  <>
+                    <span className="text-muted-foreground/50">|</span>
+                    <span>{section.createdByName}</span>
+                  </>
                 )}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-4 text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  <span>
-                    {section.participants.map((p) => p.displayName).join(", ")}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Hash className="h-4 w-4" />
+            <CardContent className="space-y-3">
+              <ParticipantList participants={section.participants} />
+              <div className="flex items-center justify-between pt-2 border-t">
+                <div className="flex items-center gap-1.5 text-sm font-medium">
+                  <Gamepad2 className="h-4 w-4 text-primary" />
                   <span>{section.gameCount}ゲーム</span>
                 </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-sm text-muted-foreground">
-                <span>開始点: {section.startingPoints.toLocaleString()}</span>
-                <span>返し: {section.returnPoints.toLocaleString()}</span>
-                <span>レート: {section.rate}</span>
+                <div className="flex gap-3 text-xs text-muted-foreground">
+                  <span>開始: {section.startingPoints.toLocaleString()}点</span>
+                  <span>返し: {section.returnPoints.toLocaleString()}</span>
+                  <span>R: {section.rate}</span>
+                </div>
               </div>
             </CardContent>
           </Card>

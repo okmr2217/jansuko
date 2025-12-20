@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Navigation } from "./navigation";
 import { UserMenu } from "./user-menu";
 import { MobileNav } from "./mobile-nav";
@@ -14,6 +13,12 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {process.env.NODE_ENV === "development" && (
+        <div className="bg-secondary py-1 text-secondary-foreground text-xs text-center tracking-wide">
+          開発環境
+        </div>
+      )}
+      <div className="text-center bg-primary text-sm"></div>
       <div className="container max-w-3xl flex h-14 items-center mx-auto px-4">
         <div className="mr-8 flex">
           <Link href="/sections" className="flex items-center space-x-2">

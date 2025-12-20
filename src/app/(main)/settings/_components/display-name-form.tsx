@@ -46,6 +46,7 @@ export function DisplayNameForm({ currentDisplayName }: DisplayNameFormProps) {
           placeholder="表示名を入力"
           maxLength={50}
           disabled={isPending}
+          className="max-w-72"
         />
       </div>
       <Button type="submit" disabled={isPending || !isChanged || !displayName}>

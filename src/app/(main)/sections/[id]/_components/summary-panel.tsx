@@ -115,20 +115,12 @@ export function SummaryPanel({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4 text-sm text-muted-foreground">
-        <div>
-          <span className="font-medium">ゲーム数:</span> {games.length}
-        </div>
-        <div>
-          <span className="font-medium">開始点:</span> {startingPoints.toLocaleString()}点
-        </div>
-        <div>
-          <span className="font-medium">返し点:</span> {returnPoints.toLocaleString()}点
-        </div>
+    <div className="space-y-2">
+      <div className="text-sm text-muted-foreground">
+        <span className="font-medium">ゲーム数:</span> {games.length}
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>

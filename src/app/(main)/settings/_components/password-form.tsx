@@ -50,6 +50,7 @@ export function PasswordForm() {
           onChange={(e) => setCurrentPassword(e.target.value)}
           placeholder="現在のパスワードを入力"
           disabled={isPending}
+          className="max-w-72"
         />
       </div>
       <div className="space-y-2">
@@ -61,6 +62,7 @@ export function PasswordForm() {
           onChange={(e) => setNewPassword(e.target.value)}
           placeholder="新しいパスワードを入力（4文字以上）"
           disabled={isPending}
+          className="max-w-72"
         />
       </div>
       <div className="space-y-2">
@@ -72,6 +74,7 @@ export function PasswordForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="新しいパスワードを再入力"
           disabled={isPending}
+          className="max-w-72"
         />
       </div>
       <Button type="submit" disabled={isPending || !isValid}>
