@@ -40,14 +40,18 @@ export function SectionList({ sections, currentUserId }: SectionListProps) {
                   {section.name}
                 </CardTitle>
                 <Badge
-                  variant={section.status === "active" ? "default" : "secondary"}
+                  variant={
+                    section.status === "active" ? "default" : "secondary"
+                  }
                 >
                   {section.status === "active" ? "進行中" : "終了"}
                 </Badge>
               </div>
               <CardDescription className="flex items-center gap-2 text-xs">
                 <Calendar className="h-3.5 w-3.5" />
-                <span>{new Date(section.createdAt).toLocaleDateString("ja-JP")}</span>
+                <span>
+                  {new Date(section.createdAt).toLocaleDateString("ja-JP")}
+                </span>
                 {section.createdByName && (
                   <>
                     <span className="text-muted-foreground/50">|</span>

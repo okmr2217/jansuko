@@ -46,7 +46,7 @@ export async function createUser(input: CreateUserInput): Promise<string> {
  */
 export async function updateUser(
   id: string,
-  input: UpdateUserInput
+  input: UpdateUserInput,
 ): Promise<void> {
   const supabase = createAdminClient();
 

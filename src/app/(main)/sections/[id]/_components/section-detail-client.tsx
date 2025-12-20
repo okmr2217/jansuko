@@ -79,7 +79,7 @@ export function SectionDetailClient({
 
   // 権限チェック
   const isParticipant = currentSection.participants.some(
-    (p) => p.userId === user.id
+    (p) => p.userId === user.id,
   );
   const isCreator = currentSection.createdBy === user.id;
   const canEdit = isParticipant || user.isAdmin;
@@ -112,7 +112,7 @@ export function SectionDetailClient({
         },
         () => {
           refreshGames();
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -123,7 +123,7 @@ export function SectionDetailClient({
         },
         () => {
           refreshGames();
-        }
+        },
       )
       .subscribe();
 
@@ -167,7 +167,7 @@ export function SectionDetailClient({
 
       if (result.success) {
         toast.success(
-          editingGame ? "点数を更新しました" : "点数を追加しました"
+          editingGame ? "点数を更新しました" : "点数を追加しました",
         );
         setIsScoreFormOpen(false);
         setEditingGame(null);

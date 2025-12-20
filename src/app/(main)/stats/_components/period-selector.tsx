@@ -20,9 +20,10 @@ interface PeriodSelectorProps {
   to?: string;
 }
 
-function getDateRangeForPeriod(
-  period: PeriodType
-): { from?: string; to?: string } {
+function getDateRangeForPeriod(period: PeriodType): {
+  from?: string;
+  to?: string;
+} {
   const now = new Date();
 
   switch (period) {
@@ -104,7 +105,10 @@ export function PeriodSelector({ period, from, to }: PeriodSelectorProps) {
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
       <div className="space-y-2">
         <Label>期間</Label>
-        <Select value={period} onValueChange={(v) => handlePeriodChange(v as PeriodType)}>
+        <Select
+          value={period}
+          onValueChange={(v) => handlePeriodChange(v as PeriodType)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="期間を選択" />
           </SelectTrigger>

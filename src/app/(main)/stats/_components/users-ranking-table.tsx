@@ -14,7 +14,10 @@ interface UsersRankingTableProps {
   currentUserId?: string;
 }
 
-export function UsersRankingTable({ stats, currentUserId }: UsersRankingTableProps) {
+export function UsersRankingTable({
+  stats,
+  currentUserId,
+}: UsersRankingTableProps) {
   const formatPercent = (value: number): string => {
     return value.toFixed(1) + "%";
   };
@@ -29,7 +32,7 @@ export function UsersRankingTable({ stats, currentUserId }: UsersRankingTablePro
   };
 
   const getRankBadgeVariant = (
-    index: number
+    index: number,
   ): "default" | "secondary" | "outline" => {
     switch (index) {
       case 0:
@@ -69,12 +72,16 @@ export function UsersRankingTable({ stats, currentUserId }: UsersRankingTablePro
               className={user.userId === currentUserId ? "bg-muted/50" : ""}
             >
               <TableCell>
-                <Badge variant={getRankBadgeVariant(index)}>{index + 1}位</Badge>
+                <Badge variant={getRankBadgeVariant(index)}>
+                  {index + 1}位
+                </Badge>
               </TableCell>
               <TableCell className="font-medium">
                 {user.displayName}
                 {user.userId === currentUserId && (
-                  <span className="ml-2 text-xs text-muted-foreground">(自分)</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    (自分)
+                  </span>
                 )}
               </TableCell>
               <TableCell className="text-right tabular-nums">
@@ -91,8 +98,8 @@ export function UsersRankingTable({ stats, currentUserId }: UsersRankingTablePro
                   user.totalSettlement < 0
                     ? "text-red-600"
                     : user.totalSettlement > 0
-                    ? "text-green-600"
-                    : ""
+                      ? "text-green-600"
+                      : ""
                 }`}
               >
                 {formatCurrency(user.totalSettlement)}円

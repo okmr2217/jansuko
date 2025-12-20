@@ -12,10 +12,11 @@ export default async function UsersPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader title="👨 雀士一覧" description="登録されている雀士の管理" />
-        <div>
-          {isAdmin && <CreateUserDialog />}
-        </div>
+        <PageHeader
+          title="👨 雀士一覧"
+          description="登録されている雀士の管理"
+        />
+        <div>{isAdmin && <CreateUserDialog />}</div>
       </div>
       <UserList users={users} isAdmin={isAdmin} currentUserId={session?.id} />
     </div>

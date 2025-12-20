@@ -35,9 +35,7 @@ export default async function NewSectionPage() {
       <Card>
         <CardHeader>
           <CardTitle>セクション情報</CardTitle>
-          <CardDescription>
-            セクションの設定を入力してください
-          </CardDescription>
+          <CardDescription>セクションの設定を入力してください</CardDescription>
         </CardHeader>
         <CardContent>
           <CreateSectionForm users={users} />

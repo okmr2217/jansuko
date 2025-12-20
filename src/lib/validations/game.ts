@@ -12,11 +12,17 @@ export const scoreInputSchema = z.object({
 
 export const createGameSchema = z.object({
   sectionId: z.string().uuid("セクションIDが不正です"),
-  scores: z.array(scoreInputSchema).min(3, "スコアは3人以上必要です").max(4, "スコアは4人以下です"),
+  scores: z
+    .array(scoreInputSchema)
+    .min(3, "スコアは3人以上必要です")
+    .max(4, "スコアは4人以下です"),
 });
 
 export const updateGameSchema = z.object({
-  scores: z.array(scoreInputSchema).min(3, "スコアは3人以上必要です").max(4, "スコアは4人以下です"),
+  scores: z
+    .array(scoreInputSchema)
+    .min(3, "スコアは3人以上必要です")
+    .max(4, "スコアは4人以下です"),
 });
 
 export type ScoreInput = z.infer<typeof scoreInputSchema>;
@@ -33,7 +39,7 @@ export type UpdateGameInput = z.infer<typeof updateGameSchema>;
 export function validateTotalPoints(
   scores: ScoreInput[],
   startingPoints: number,
-  playerCount: number
+  playerCount: number,
 ): string | null {
   if (scores.length !== playerCount) {
     return `参加者${playerCount}人分のスコアが必要です`;

@@ -66,7 +66,7 @@ export async function getUser(id: string): Promise<User | null> {
  * 表示名でユーザーを検索する（重複チェック用）
  */
 export async function getUserByDisplayName(
-  displayName: string
+  displayName: string,
 ): Promise<User | null> {
   const supabase = createAdminClient();
 

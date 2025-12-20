@@ -49,7 +49,7 @@ export async function getSession(): Promise<SessionUser | null> {
 
   try {
     const decoded = Buffer.from(sessionCookie.value, "base64").toString(
-      "utf-8"
+      "utf-8",
     );
     const sessionData: SessionData = JSON.parse(decoded);
 

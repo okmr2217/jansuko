@@ -64,12 +64,15 @@ export function SummaryPanel({
 
     // 順位を計算（totalPointsで降順ソート）
     const sortedByPoints = [...summaries].sort(
-      (a, b) => b.totalPoints - a.totalPoints
+      (a, b) => b.totalPoints - a.totalPoints,
     );
 
     sortedByPoints.forEach((summary, index) => {
       // 同点の場合は同じ順位
-      if (index > 0 && summary.totalPoints === sortedByPoints[index - 1].totalPoints) {
+      if (
+        index > 0 &&
+        summary.totalPoints === sortedByPoints[index - 1].totalPoints
+      ) {
         summary.rank = sortedByPoints[index - 1].rank;
       } else {
         summary.rank = index + 1;
@@ -95,7 +98,9 @@ export function SummaryPanel({
     return prefix + amount.toLocaleString() + "円";
   };
 
-  const getRankBadgeVariant = (rank: number): "default" | "secondary" | "outline" => {
+  const getRankBadgeVariant = (
+    rank: number,
+  ): "default" | "secondary" | "outline" => {
     switch (rank) {
       case 1:
         return "default";
@@ -149,7 +154,11 @@ export function SummaryPanel({
                   </TableCell>
                   <TableCell
                     className={`text-right tabular-nums ${
-                      summary.pointDiff < 0 ? "text-red-600" : summary.pointDiff > 0 ? "text-green-600" : ""
+                      summary.pointDiff < 0
+                        ? "text-red-600"
+                        : summary.pointDiff > 0
+                          ? "text-green-600"
+                          : ""
                     }`}
                   >
                     {formatPoints(summary.pointDiff)}
@@ -157,7 +166,11 @@ export function SummaryPanel({
                   {rate > 0 && (
                     <TableCell
                       className={`text-right tabular-nums font-medium ${
-                        summary.settlement < 0 ? "text-red-600" : summary.settlement > 0 ? "text-green-600" : ""
+                        summary.settlement < 0
+                          ? "text-red-600"
+                          : summary.settlement > 0
+                            ? "text-green-600"
+                            : ""
                       }`}
                     >
                       {formatCurrency(summary.settlement)}

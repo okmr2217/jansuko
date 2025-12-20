@@ -21,7 +21,9 @@ export interface UpdateSectionInput {
 /**
  * 新しいセクションを作成する
  */
-export async function createSection(input: CreateSectionInput): Promise<string> {
+export async function createSection(
+  input: CreateSectionInput,
+): Promise<string> {
   const supabase = createAdminClient();
 
   // セクションを作成
@@ -45,12 +47,11 @@ export async function createSection(input: CreateSectionInput): Promise<string> 
   }
 
   // 参加者を追加
-  const participantsData: TablesInsert<"section_participants">[] = input.participantIds.map(
-    (userId) => ({
+  const participantsData: TablesInsert<"section_participants">[] =
+    input.participantIds.map((userId) => ({
       section_id: section.id,
       user_id: userId,
-    })
-  );
+    }));
 
   const { error: participantsError } = await supabase
     .from("section_participants")
@@ -70,7 +71,7 @@ export async function createSection(input: CreateSectionInput): Promise<string> 
  */
 export async function updateSection(
   id: string,
-  input: UpdateSectionInput
+  input: UpdateSectionInput,
 ): Promise<void> {
   const supabase = createAdminClient();
 

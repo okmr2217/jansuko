@@ -4,7 +4,14 @@ import { useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutGrid, Users, BarChart3, HelpCircle, X } from "lucide-react";
+import {
+  Menu,
+  LayoutGrid,
+  Users,
+  BarChart3,
+  HelpCircle,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +21,7 @@ function useIsMounted() {
   return useSyncExternalStore(
     emptySubscribe,
     () => true,
-    () => false
+    () => false,
   );
 }
 
@@ -55,11 +62,7 @@ export function MobileNav() {
       <div className="fixed top-0 right-0 bottom-0 z-50 w-3/4 max-w-sm bg-background p-6 shadow-lg md:hidden">
         <div className="flex items-center justify-between mb-6">
           <span className="text-lg font-semibold">メニュー</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
             <X className="h-5 w-5" />
             <span className="sr-only">閉じる</span>
           </Button>
@@ -77,7 +80,7 @@ export function MobileNav() {
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 )}
               >
                 <Icon className="h-5 w-5" />

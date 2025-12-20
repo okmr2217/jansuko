@@ -35,7 +35,8 @@ export function ReopenSectionDialog({
         <DialogHeader>
           <DialogTitle>セクションを再開</DialogTitle>
           <DialogDescription>
-            「{sectionName}」を進行中に戻しますか？再開後は点数の入力・修正・削除が可能になります。
+            「{sectionName}
+            」を進行中に戻しますか？再開後は点数の入力・修正・削除が可能になります。
           </DialogDescription>
         </DialogHeader>
 

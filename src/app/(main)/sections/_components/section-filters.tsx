@@ -46,7 +46,7 @@ export function SectionFilters({
         router.push(`/sections?${params.toString()}`);
       });
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const handleStatusChange = (value: string) => {

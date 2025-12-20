@@ -37,7 +37,7 @@ export interface GetSectionsOptions {
  * セクション一覧を取得する
  */
 export async function getSections(
-  options: GetSectionsOptions = {}
+  options: GetSectionsOptions = {},
 ): Promise<SectionListItem[]> {
   const supabase = createAdminClient();
   const { status, search, sortOrder = "desc" } = options;
@@ -64,7 +64,7 @@ export async function getSections(
         user:users(display_name)
       ),
       games(count)
-    `
+    `,
     )
     .order("created_at", { ascending: sortOrder === "asc" });
 
@@ -96,8 +96,9 @@ export async function getSections(
     playerCount: section.player_count,
     status: section.status,
     createdBy: section.created_by,
-    createdByName: (section.creator as { display_name: string } | null)
-      ?.display_name ?? null,
+    createdByName:
+      (section.creator as { display_name: string } | null)?.display_name ??
+      null,
     createdAt: section.created_at,
     closedAt: section.closed_at,
     participants: (
@@ -142,7 +143,7 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
         user:users(display_name)
       ),
       games(count)
-    `
+    `,
     )
     .eq("id", id)
     .is("deleted_at", null)
@@ -164,8 +165,8 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
     playerCount: data.player_count,
     status: data.status,
     createdBy: data.created_by,
-    createdByName: (data.creator as { display_name: string } | null)
-      ?.display_name ?? null,
+    createdByName:
+      (data.creator as { display_name: string } | null)?.display_name ?? null,
     createdAt: data.created_at,
     closedAt: data.closed_at,
     participants: (
@@ -188,7 +189,7 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
  */
 export async function isUserParticipant(
   sectionId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   const supabase = createAdminClient();
 
@@ -214,7 +215,7 @@ export async function isUserParticipant(
  */
 export async function isSectionCreator(
   sectionId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   const supabase = createAdminClient();
 

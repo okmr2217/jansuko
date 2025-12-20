@@ -110,7 +110,9 @@ export function ScoreInputForm({
       }
 
       if (points % 100 !== 0) {
-        setError(`${participant.displayName}の点数は100点単位で入力してください`);
+        setError(
+          `${participant.displayName}の点数は100点単位で入力してください`,
+        );
         return;
       }
 
@@ -124,7 +126,7 @@ export function ScoreInputForm({
     const total = scoreInputs.reduce((sum, s) => sum + s.points, 0);
     if (total !== expectedTotal) {
       setError(
-        `点数の合計が${expectedTotal.toLocaleString()}点になる必要があります（現在: ${total.toLocaleString()}点、差分: ${(expectedTotal - total).toLocaleString()}点）`
+        `点数の合計が${expectedTotal.toLocaleString()}点になる必要があります（現在: ${total.toLocaleString()}点、差分: ${(expectedTotal - total).toLocaleString()}点）`,
       );
       return;
     }
@@ -137,7 +139,9 @@ export function ScoreInputForm({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {editingGame ? `ゲーム ${editingGame.gameNumber} を編集` : "点数を入力"}
+            {editingGame
+              ? `ゲーム ${editingGame.gameNumber} を編集`
+              : "点数を入力"}
           </DialogTitle>
           <DialogDescription>
             各プレイヤーの点数を入力してください（100点単位）
@@ -147,8 +151,14 @@ export function ScoreInputForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-3">
             {participants.map((participant) => (
-              <div key={participant.userId} className="grid grid-cols-3 items-center gap-4">
-                <Label htmlFor={`score-${participant.userId}`} className="text-right">
+              <div
+                key={participant.userId}
+                className="grid grid-cols-3 items-center gap-4"
+              >
+                <Label
+                  htmlFor={`score-${participant.userId}`}
+                  className="text-right"
+                >
                   {participant.displayName}
                 </Label>
                 <Input
@@ -157,7 +167,9 @@ export function ScoreInputForm({
                   inputMode="numeric"
                   placeholder="25000"
                   value={scores[participant.userId] ?? ""}
-                  onChange={(e) => handleScoreChange(participant.userId, e.target.value)}
+                  onChange={(e) =>
+                    handleScoreChange(participant.userId, e.target.value)
+                  }
                   className="col-span-2 tabular-nums"
                   disabled={isSubmitting}
                 />
@@ -168,19 +180,26 @@ export function ScoreInputForm({
           <div className="border-t pt-3 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">合計:</span>
-              <span className={`tabular-nums font-medium ${currentTotal !== expectedTotal ? "text-red-600" : ""}`}>
+              <span
+                className={`tabular-nums font-medium ${currentTotal !== expectedTotal ? "text-red-600" : ""}`}
+              >
                 {currentTotal.toLocaleString()}点
               </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">期待値:</span>
-              <span className="tabular-nums">{expectedTotal.toLocaleString()}点</span>
+              <span className="tabular-nums">
+                {expectedTotal.toLocaleString()}点
+              </span>
             </div>
             {difference !== 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">差分:</span>
-                <span className={`tabular-nums font-medium ${difference !== 0 ? "text-red-600" : ""}`}>
-                  {difference > 0 ? "+" : ""}{difference.toLocaleString()}点
+                <span
+                  className={`tabular-nums font-medium ${difference !== 0 ? "text-red-600" : ""}`}
+                >
+                  {difference > 0 ? "+" : ""}
+                  {difference.toLocaleString()}点
                 </span>
               </div>
             )}

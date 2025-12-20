@@ -35,7 +35,7 @@ const updatePasswordSchema = z.object({
  * 表示名を更新する
  */
 export async function updateDisplayNameAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await getSession();
@@ -88,7 +88,7 @@ export async function updateDisplayNameAction(
  * パスワードを更新する
  */
 export async function updatePasswordAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await getSession();

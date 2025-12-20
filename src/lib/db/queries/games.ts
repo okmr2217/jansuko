@@ -25,7 +25,7 @@ export interface GameWithScores {
  * セクションのゲーム一覧をスコア付きで取得する
  */
 export async function getGamesWithScores(
-  sectionId: string
+  sectionId: string,
 ): Promise<GameWithScores[]> {
   const supabase = createAdminClient();
 
@@ -45,7 +45,7 @@ export async function getGamesWithScores(
         points,
         user:users(display_name)
       )
-    `
+    `,
     )
     .eq("section_id", sectionId)
     .order("game_number", { ascending: true });
@@ -82,7 +82,7 @@ export async function getGamesWithScores(
  * 特定のゲームをスコア付きで取得する
  */
 export async function getGameWithScores(
-  gameId: string
+  gameId: string,
 ): Promise<GameWithScores | null> {
   const supabase = createAdminClient();
 
@@ -102,7 +102,7 @@ export async function getGameWithScores(
         points,
         user:users(display_name)
       )
-    `
+    `,
     )
     .eq("id", gameId)
     .single();

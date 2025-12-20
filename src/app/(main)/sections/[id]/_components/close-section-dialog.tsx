@@ -35,7 +35,8 @@ export function CloseSectionDialog({
         <DialogHeader>
           <DialogTitle>セクションを終了</DialogTitle>
           <DialogDescription>
-            「{sectionName}」を終了しますか？終了後は点数の入力・修正・削除ができなくなります。
+            「{sectionName}
+            」を終了しますか？終了後は点数の入力・修正・削除ができなくなります。
           </DialogDescription>
         </DialogHeader>
 

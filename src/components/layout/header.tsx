@@ -23,7 +23,9 @@ export function Header({ user }: HeaderProps) {
       <div className="container max-w-3xl flex h-14 items-center mx-auto px-4">
         <div className="mr-8 flex">
           <Link href="/sections" className="flex items-center space-x-2">
-            <h1 className="text-2xl font-extrabold">じゃん<span className="text-primary">スコ</span></h1>
+            <h1 className="text-2xl font-extrabold">
+              じゃん<span className="text-primary">スコ</span>
+            </h1>
           </Link>
         </div>
         <div className="hidden md:flex md:flex-1">

@@ -48,7 +48,9 @@ export async function createGame(input: CreateGameInput): Promise<string> {
     points: score.points,
   }));
 
-  const { error: scoresError } = await supabase.from("scores").insert(scoresData);
+  const { error: scoresError } = await supabase
+    .from("scores")
+    .insert(scoresData);
 
   if (scoresError) {
     // ゲームを削除してロールバック
@@ -64,7 +66,7 @@ export async function createGame(input: CreateGameInput): Promise<string> {
  */
 export async function updateGameScores(
   gameId: string,
-  input: UpdateGameInput
+  input: UpdateGameInput,
 ): Promise<void> {
   const supabase = createAdminClient();
 
@@ -85,7 +87,9 @@ export async function updateGameScores(
     points: score.points,
   }));
 
-  const { error: insertError } = await supabase.from("scores").insert(scoresData);
+  const { error: insertError } = await supabase
+    .from("scores")
+    .insert(scoresData);
 
   if (insertError) {
     throw new Error(`スコアの追加に失敗しました: ${insertError.message}`);

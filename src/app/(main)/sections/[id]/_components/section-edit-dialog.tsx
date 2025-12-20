@@ -43,10 +43,10 @@ export function SectionEditDialog({
 }: SectionEditDialogProps) {
   const [name, setName] = useState(section.name);
   const [startingPoints, setStartingPoints] = useState(
-    String(section.startingPoints)
+    String(section.startingPoints),
   );
   const [returnPoints, setReturnPoints] = useState(
-    String(section.returnPoints)
+    String(section.returnPoints),
   );
   const [rate, setRate] = useState(String(section.rate));
   const [error, setError] = useState<string | null>(null);

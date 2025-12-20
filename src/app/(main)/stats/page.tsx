@@ -71,7 +71,10 @@ async function StatsContent({ from, to }: { from?: string; to?: string }) {
         <StatsCards stats={stats} currentUserId={user?.id} />
       </div>
       <div>
-        <SectionHeader title="🏆 雀士ランキング" description={`${stats.totalSections}セクション / ${stats.totalGames}ゲームの統計`} />
+        <SectionHeader
+          title="🏆 雀士ランキング"
+          description={`${stats.totalSections}セクション / ${stats.totalGames}ゲームの統計`}
+        />
         <div className="mt-4">
           <UsersRankingTable stats={stats} currentUserId={user?.id} />
         </div>

@@ -176,7 +176,7 @@ export function CreateSectionForm({ users }: CreateSectionFormProps) {
                                   field.onChange([...field.value, user.id]);
                                 } else {
                                   field.onChange(
-                                    field.value.filter((id) => id !== user.id)
+                                    field.value.filter((id) => id !== user.id),
                                   );
                                 }
                               }}

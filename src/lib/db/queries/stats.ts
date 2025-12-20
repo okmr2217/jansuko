@@ -56,7 +56,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
           points
         )
       )
-    `
+    `,
     )
     .eq("status", "closed");
 
@@ -127,12 +127,12 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
       const rankMap = new Map<string, number>();
       let currentRank = 1;
       for (let i = 0; i < sortedScores.length; i++) {
-        if (
-          i > 0 &&
-          sortedScores[i].points === sortedScores[i - 1].points
-        ) {
+        if (i > 0 && sortedScores[i].points === sortedScores[i - 1].points) {
           // 同点の場合は同じ順位
-          rankMap.set(sortedScores[i].user_id, rankMap.get(sortedScores[i - 1].user_id)!);
+          rankMap.set(
+            sortedScores[i].user_id,
+            rankMap.get(sortedScores[i - 1].user_id)!,
+          );
         } else {
           rankMap.set(sortedScores[i].user_id, currentRank);
         }
@@ -182,7 +182,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
 
     const totalSettlement = userData.games.reduce(
       (sum, g) => sum + g.settlement,
-      0
+      0,
     );
 
     users.push({
@@ -213,7 +213,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
  */
 export async function getUserStats(
   userId: string,
-  dateRange?: DateRange
+  dateRange?: DateRange,
 ): Promise<UserStats | null> {
   const result = await getStats(dateRange);
   return result.users.find((u) => u.userId === userId) ?? null;

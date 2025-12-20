@@ -15,7 +15,10 @@ import {
   GetSectionsOptions,
   SectionListItem,
 } from "@/lib/db/queries/sections";
-import { createSectionSchema, updateSectionSchema } from "@/lib/validations/section";
+import {
+  createSectionSchema,
+  updateSectionSchema,
+} from "@/lib/validations/section";
 
 export interface ActionResult {
   success: boolean;
@@ -38,7 +41,7 @@ async function requireAuth() {
  * セクションを作成する
  */
 export async function createSectionAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -94,7 +97,7 @@ export async function createSectionAction(
  */
 export async function updateSectionAction(
   sectionId: string,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -134,7 +137,7 @@ export async function updateSectionAction(
  * セクションを終了する
  */
 export async function closeSectionAction(
-  sectionId: string
+  sectionId: string,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -161,7 +164,7 @@ export async function closeSectionAction(
  * セクションを削除する
  */
 export async function deleteSectionAction(
-  sectionId: string
+  sectionId: string,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -187,7 +190,7 @@ export async function deleteSectionAction(
  * セクションを再開する（終了→進行中に戻す）
  */
 export async function reopenSectionAction(
-  sectionId: string
+  sectionId: string,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -214,7 +217,7 @@ export async function reopenSectionAction(
  * セクション一覧を取得する（リアルタイム更新用）
  */
 export async function fetchSectionsAction(
-  options: GetSectionsOptions = {}
+  options: GetSectionsOptions = {},
 ): Promise<SectionListItem[]> {
   return getSections(options);
 }

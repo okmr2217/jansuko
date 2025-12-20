@@ -40,11 +40,7 @@ export default async function SectionDetailPage({
         </Button>
       </div>
 
-      <SectionDetailClient
-        section={section}
-        initialGames={games}
-        user={user}
-      />
+      <SectionDetailClient section={section} initialGames={games} user={user} />
     </div>
   );
 }

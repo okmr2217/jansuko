@@ -12,10 +12,7 @@ import {
   isUserParticipant,
   isSectionCreator,
 } from "@/lib/db/queries/sections";
-import {
-  getGamesWithScores,
-  GameWithScores,
-} from "@/lib/db/queries/games";
+import { getGamesWithScores, GameWithScores } from "@/lib/db/queries/games";
 import {
   createGameSchema,
   updateGameSchema,
@@ -45,7 +42,7 @@ async function requireAuth() {
  */
 export async function createGameAction(
   sectionId: string,
-  scores: ScoreInput[]
+  scores: ScoreInput[],
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -64,7 +61,10 @@ export async function createGameAction(
 
     // セクションがアクティブかチェック
     if (section.status !== "active") {
-      return { success: false, error: "終了したセクションには点数を入力できません" };
+      return {
+        success: false,
+        error: "終了したセクションには点数を入力できません",
+      };
     }
 
     // バリデーション
@@ -78,7 +78,7 @@ export async function createGameAction(
     const totalError = validateTotalPoints(
       scores,
       section.startingPoints,
-      section.playerCount
+      section.playerCount,
     );
     if (totalError) {
       return { success: false, error: totalError };
@@ -105,7 +105,7 @@ export async function createGameAction(
 export async function updateGameAction(
   sectionId: string,
   gameId: string,
-  scores: ScoreInput[]
+  scores: ScoreInput[],
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -124,7 +124,10 @@ export async function updateGameAction(
 
     // セクションがアクティブかチェック
     if (section.status !== "active") {
-      return { success: false, error: "終了したセクションの点数は修正できません" };
+      return {
+        success: false,
+        error: "終了したセクションの点数は修正できません",
+      };
     }
 
     // バリデーション
@@ -138,7 +141,7 @@ export async function updateGameAction(
     const totalError = validateTotalPoints(
       scores,
       section.startingPoints,
-      section.playerCount
+      section.playerCount,
     );
     if (totalError) {
       return { success: false, error: totalError };
@@ -161,7 +164,7 @@ export async function updateGameAction(
  */
 export async function deleteGameAction(
   sectionId: string,
-  gameId: string
+  gameId: string,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -180,7 +183,10 @@ export async function deleteGameAction(
 
     // セクションがアクティブかチェック
     if (section.status !== "active") {
-      return { success: false, error: "終了したセクションのゲームは削除できません" };
+      return {
+        success: false,
+        error: "終了したセクションのゲームは削除できません",
+      };
     }
 
     // ゲームを削除
@@ -199,7 +205,7 @@ export async function deleteGameAction(
  * セクションのゲーム一覧を取得する（リアルタイム更新用）
  */
 export async function fetchGamesAction(
-  sectionId: string
+  sectionId: string,
 ): Promise<GameWithScores[]> {
   return getGamesWithScores(sectionId);
 }

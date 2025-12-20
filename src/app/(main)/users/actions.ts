@@ -28,7 +28,7 @@ async function requireAdmin(): Promise<void> {
  * 雀士を作成する
  */
 export async function createUserAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     await requireAdmin();
@@ -71,7 +71,7 @@ export async function createUserAction(
  */
 export async function updateUserAction(
   id: string,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     await requireAdmin();

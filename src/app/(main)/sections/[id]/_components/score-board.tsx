@@ -61,7 +61,10 @@ export function ScoreBoard({
             <TableRow>
               <TableHead className="w-16 text-center">#</TableHead>
               {participants.map((participant) => (
-                <TableHead key={participant.userId} className="text-center min-w-24">
+                <TableHead
+                  key={participant.userId}
+                  className="text-center min-w-24"
+                >
                   {participant.displayName}
                 </TableHead>
               ))}

@@ -76,7 +76,7 @@ export function SectionsRealtimeWrapper({
         (payload) => {
           console.log("sections change:", payload);
           refetchSections();
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -88,7 +88,7 @@ export function SectionsRealtimeWrapper({
         (payload) => {
           console.log("section_participants change:", payload);
           refetchSections();
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -100,9 +100,9 @@ export function SectionsRealtimeWrapper({
         (payload) => {
           console.log("games change:", payload);
           refetchSections();
-        }
+        },
       );
-      
+
     channelRef.current = channel;
 
     channel.subscribe((status, err) => {

@@ -15,7 +15,9 @@ interface SectionsPageProps {
   }>;
 }
 
-export default async function SectionsPage({ searchParams }: SectionsPageProps) {
+export default async function SectionsPage({
+  searchParams,
+}: SectionsPageProps) {
   const session = await getSession();
   const params = await searchParams;
 

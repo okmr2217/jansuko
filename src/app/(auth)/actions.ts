@@ -12,7 +12,7 @@ export interface LoginState {
 
 export async function login(
   _prevState: LoginState | null,
-  formData: FormData
+  formData: FormData,
 ): Promise<LoginState | null> {
   const rawData = {
     displayName: formData.get("displayName") as string,
