@@ -31,7 +31,9 @@ export default async function LoginPage() {
         <CardHeader className="space-y-1">
           <div className="flex justify-center">
             <h1 className="text-3xl font-extrabold">
-              じゃん<span className="text-primary">スコ</span>
+              <span className="text-destructive">じ</span>
+              ゃん
+              <span className="text-primary">スコ</span>
             </h1>
           </div>
           <CardDescription className="text-center">

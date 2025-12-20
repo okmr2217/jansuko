@@ -19,12 +19,13 @@ export function Header({ user }: HeaderProps) {
           開発環境
         </div>
       )}
-      <div className="text-center bg-primary text-sm"></div>
       <div className="container max-w-3xl flex h-14 items-center mx-auto px-4">
         <div className="mr-8 flex">
           <Link href="/sections" className="flex items-center space-x-2">
             <h1 className="text-2xl font-extrabold">
-              じゃん<span className="text-primary">スコ</span>
+              <span className="text-destructive">じ</span>
+              ゃん
+              <span className="text-primary">スコ</span>
             </h1>
           </Link>
         </div>
