@@ -5,6 +5,7 @@ import { Navigation } from "./navigation";
 import { UserMenu } from "./user-menu";
 import { MobileNav } from "./mobile-nav";
 import type { SessionUser } from "@/lib/auth/session";
+import { ThemeToggle } from "./theme-toggle";
 
 interface HeaderProps {
   user: SessionUser;
@@ -28,7 +29,8 @@ export function Header({ user }: HeaderProps) {
         <div className="hidden md:flex md:flex-1">
           <Navigation />
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex flex-1 items-center justify-end space-x-3">
+          <ThemeToggle />
           <UserMenu user={user} />
           <div className="md:hidden">
             <MobileNav />
