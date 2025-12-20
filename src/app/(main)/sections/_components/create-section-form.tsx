@@ -103,7 +103,11 @@ export function CreateSectionForm({ users }: CreateSectionFormProps) {
             <FormItem>
               <FormLabel>セクション名</FormLabel>
               <FormControl>
-                <Input placeholder="例: 2024年12月 定例会" {...field} />
+                <Input
+                  placeholder="例: 2024年12月 定例会"
+                  className="max-w-72"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -230,9 +234,7 @@ export function CreateSectionForm({ users }: CreateSectionFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>返し点</FormLabel>
-                <FormDescription>
-                  順位点計算の基準となる点数
-                </FormDescription>
+                <FormDescription>順位点計算の基準となる点数</FormDescription>
                 <Select
                   onValueChange={(value) => field.onChange(Number(value))}
                   value={field.value.toString()}

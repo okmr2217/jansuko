@@ -50,7 +50,7 @@ export function UsersRankingTable({ stats, currentUserId }: UsersRankingTablePro
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow>

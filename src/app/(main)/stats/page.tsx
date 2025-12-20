@@ -13,6 +13,7 @@ import { getStats, DateRange } from "@/lib/db/queries/stats";
 import { PeriodSelector, PeriodType } from "./_components/period-selector";
 import { StatsCards } from "./_components/stats-cards";
 import { UsersRankingTable } from "./_components/users-ranking-table";
+import { SectionHeader } from "@/components/common/section-header";
 
 interface StatsPageProps {
   searchParams: Promise<{
@@ -66,19 +67,15 @@ async function StatsContent({ from, to }: { from?: string; to?: string }) {
 
   return (
     <>
-      <StatsCards stats={stats} currentUserId={user?.id} />
-
-      <Card>
-        <CardHeader>
-          <CardTitle>雀士ランキング</CardTitle>
-          <CardDescription>
-            {stats.totalSections}セクション / {stats.totalGames}ゲームの統計
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="mb-8">
+        <StatsCards stats={stats} currentUserId={user?.id} />
+      </div>
+      <div>
+        <SectionHeader title="🏆 雀士ランキング" description={`${stats.totalSections}セクション / ${stats.totalGames}ゲームの統計`} />
+        <div className="mt-4">
           <UsersRankingTable stats={stats} currentUserId={user?.id} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </>
   );
 }
@@ -91,7 +88,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="統計" description="雀士の成績統計と分析" />
+      <PageHeader title="📉 統計" description="雀士の成績統計と分析" />
       <PeriodSelector period={period} from={from} to={to} />
       <Suspense fallback={<StatsLoading />}>
         <StatsContent from={from} to={to} />

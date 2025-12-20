@@ -42,8 +42,12 @@ export function SectionEditDialog({
   isSubmitting,
 }: SectionEditDialogProps) {
   const [name, setName] = useState(section.name);
-  const [startingPoints, setStartingPoints] = useState(String(section.startingPoints));
-  const [returnPoints, setReturnPoints] = useState(String(section.returnPoints));
+  const [startingPoints, setStartingPoints] = useState(
+    String(section.startingPoints)
+  );
+  const [returnPoints, setReturnPoints] = useState(
+    String(section.returnPoints)
+  );
   const [rate, setRate] = useState(String(section.rate));
   const [error, setError] = useState<string | null>(null);
 
@@ -80,9 +84,7 @@ export function SectionEditDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>セクションを編集</DialogTitle>
-          <DialogDescription>
-            セクションの設定を変更します
-          </DialogDescription>
+          <DialogDescription>セクションの設定を変更します</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,6 +96,7 @@ export function SectionEditDialog({
               onChange={(e) => setName(e.target.value)}
               placeholder="例: 2024年12月 定例会"
               disabled={isSubmitting}
+              className="max-w-72"
             />
           </div>
 
@@ -142,7 +145,11 @@ export function SectionEditDialog({
 
           <div className="space-y-2">
             <Label htmlFor="rate">レート</Label>
-            <Select value={rate} onValueChange={setRate} disabled={isSubmitting}>
+            <Select
+              value={rate}
+              onValueChange={setRate}
+              disabled={isSubmitting}
+            >
               <SelectTrigger id="rate">
                 <SelectValue />
               </SelectTrigger>

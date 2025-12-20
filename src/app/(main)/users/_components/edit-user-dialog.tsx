@@ -100,7 +100,11 @@ export function EditUserDialog({ user }: EditUserDialogProps) {
                 <FormItem>
                   <FormLabel>表示名</FormLabel>
                   <FormControl>
-                    <Input placeholder="例: 山田太郎" {...field} />
+                    <Input
+                      placeholder="例: 山田太郎"
+                      className="max-w-72"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,6 +120,7 @@ export function EditUserDialog({ user }: EditUserDialogProps) {
                     <Input
                       type="password"
                       placeholder="4文字以上"
+                      className="max-w-72"
                       {...field}
                     />
                   </FormControl>

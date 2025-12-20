@@ -22,15 +22,11 @@ function StatsCard({
   content: string;
 }) {
   return (
-    <Card className="gap-4">
-      <CardHeader>
-        <CardDescription>{description}</CardDescription>
-        <CardTitle className="text-3xl">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-xs text-muted-foreground">{content}</p>
-      </CardContent>
-    </Card>
+    <div>
+      <div className="text-sm text-muted-foreground mb-1">{description}</div>
+      <div className="text-3xl font-bold mb-2">{title}</div>
+      <div className="text-xs text-muted-foreground">{content}</div>
+    </div>
   );
 }
 
@@ -55,7 +51,7 @@ export function StatsCards({ stats, currentUserId }: StatsCardsProps) {
 
   if (!currentUserStats) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-y-8 grid-cols-2 md:grid-cols-4">
         <StatsCard description="勝率" title="--%" content="1位の割合" />
         <StatsCard description="平均順位" title="--" content="全ゲームの平均" />
         <StatsCard description="通算収支" title="--" content="精算額の合計" />
@@ -69,7 +65,7 @@ export function StatsCards({ stats, currentUserId }: StatsCardsProps) {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-y-8 grid-cols-2 md:grid-cols-4">
       <StatsCard
         description="勝率"
         title={formatPercent(currentUserStats.winRate)}

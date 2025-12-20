@@ -19,8 +19,6 @@ import { SessionUser } from "@/lib/auth/session";
 import { ScoreInput } from "@/lib/validations/game";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScoreBoard } from "./score-board";
 import { SummaryPanel } from "./summary-panel";
 import { ScoreInputForm } from "./score-input-form";
@@ -41,7 +39,6 @@ import {
   reopenSectionAction,
   deleteSectionAction,
 } from "../../actions";
-import { ParticipantList } from "../../_components/participant-list";
 
 interface SectionDetailClientProps {
   section: SectionListItem;
@@ -371,25 +368,25 @@ export function SectionDetailClient({
         <div className="grid grid-cols-3 gap-y-3 md:grid-cols-6">
           <div className="col-span-3">
             <div className="text-sm text-muted-foreground">参加者</div>
-            <p className="text-lg font-medium">
+            <p className="font-medium">
               {currentSection.participants.map((p) => p.displayName).join(", ")}
             </p>
           </div>
           <div>
             <div className="text-sm text-muted-foreground">開始点</div>
-            <p className="text-lg font-medium">
+            <p className="font-medium">
               {currentSection.startingPoints.toLocaleString()}点
             </p>
           </div>
           <div>
             <div className="text-sm text-muted-foreground">返し点</div>
-            <p className="text-lg font-medium">
+            <p className="font-medium">
               {currentSection.returnPoints.toLocaleString()}点
             </p>
           </div>
           <div>
             <div className="text-sm text-muted-foreground">レート</div>
-            <p className="text-lg font-medium">
+            <p className="font-medium">
               {currentSection.rate === 0
                 ? "ノーレート"
                 : `¥${currentSection.rate}/1,000点`}
