@@ -5,10 +5,10 @@ export default async function HelpPage() {
   const helpHtml = await getHelpContentHtml();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 scroll-pt-24">
       <PageHeader title="❓ ヘルプ" description="使い方ガイド" />
       <article
-        className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-table:text-sm prose-th:bg-muted prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 prose-table:border prose-th:border prose-td:border"
+        className="prose prose-sm sm:prose-base max-w-none dark:prose-invert"
         dangerouslySetInnerHTML={{ __html: helpHtml }}
       />
     </div>
