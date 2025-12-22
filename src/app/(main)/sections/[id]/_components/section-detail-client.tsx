@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, Lock, Unlock, Pencil, Trash2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { SectionListItem } from "@/lib/db/queries/sections";
 import { GameWithScores } from "@/lib/db/queries/games";
 import { SessionUser } from "@/lib/auth/session";
@@ -87,42 +86,6 @@ export function SectionDetailClient({
       console.error("ゲームの取得に失敗しました");
     }
   }, [section.id]);
-
-  // リアルタイム購読
-  useEffect(() => {
-    const supabase = createClient();
-
-    const channel = supabase
-      .channel(`section-${section.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "games",
-          filter: `section_id=eq.${section.id}`,
-        },
-        () => {
-          refreshGames();
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "scores",
-        },
-        () => {
-          refreshGames();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [section.id, refreshGames]);
 
   // 点数入力ダイアログを開く（新規）
   const handleAddGame = () => {
