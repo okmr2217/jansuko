@@ -20,6 +20,18 @@ interface PeriodSelectorProps {
   to?: string;
 }
 
+function toLocalISOString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  const ms = String(date.getMilliseconds()).padStart(3, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}`;
+}
+
 function getDateRangeForPeriod(period: PeriodType): {
   from?: string;
   to?: string;
@@ -30,7 +42,7 @@ function getDateRangeForPeriod(period: PeriodType): {
     case "this-month": {
       const from = new Date(now.getFullYear(), now.getMonth(), 1);
       return {
-        from: from.toISOString().split("T")[0],
+        from: toLocalISOString(from).split("T")[0],
         to: undefined,
       };
     }
@@ -38,8 +50,8 @@ function getDateRangeForPeriod(period: PeriodType): {
       const from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       const to = new Date(now.getFullYear(), now.getMonth(), 0);
       return {
-        from: from.toISOString().split("T")[0],
-        to: to.toISOString().split("T")[0],
+        from: toLocalISOString(from).split("T")[0],
+        to: toLocalISOString(to).split("T")[0],
       };
     }
     case "all":

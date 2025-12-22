@@ -56,19 +56,19 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
           points
         )
       )
-    `,
+    `
     )
     .eq("status", "closed");
 
   // 期間フィルター
   if (dateRange?.from) {
-    sectionsQuery = sectionsQuery.gte("closed_at", dateRange.from);
+    sectionsQuery = sectionsQuery.gte("created_at", dateRange.from);
   }
   if (dateRange?.to) {
     // toの日付の翌日の0時までを含める
     const toDate = new Date(dateRange.to);
     toDate.setDate(toDate.getDate() + 1);
-    sectionsQuery = sectionsQuery.lt("closed_at", toDate.toISOString());
+    sectionsQuery = sectionsQuery.lt("created_at", toDate.toISOString());
   }
 
   const { data: sections, error } = await sectionsQuery;
@@ -131,7 +131,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
           // 同点の場合は同じ順位
           rankMap.set(
             sortedScores[i].user_id,
-            rankMap.get(sortedScores[i - 1].user_id)!,
+            rankMap.get(sortedScores[i - 1].user_id)!
           );
         } else {
           rankMap.set(sortedScores[i].user_id, currentRank);
@@ -182,7 +182,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
 
     const totalSettlement = userData.games.reduce(
       (sum, g) => sum + g.settlement,
-      0,
+      0
     );
 
     users.push({
@@ -213,7 +213,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
  */
 export async function getUserStats(
   userId: string,
-  dateRange?: DateRange,
+  dateRange?: DateRange
 ): Promise<UserStats | null> {
   const result = await getStats(dateRange);
   return result.users.find((u) => u.userId === userId) ?? null;
