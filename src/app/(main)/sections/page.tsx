@@ -3,9 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth/session";
 import { getSections } from "@/lib/db/queries/sections";
-import { SectionsRealtimeWrapper } from "./_components/sections-realtime-wrapper";
 import { SectionStatus } from "@/lib/db/queries/sections";
 import { PageHeader } from "@/components/common/page-header";
+import { SectionFilters } from "./_components/section-filters";
+import { SectionList } from "./_components/section-list";
 
 interface SectionsPageProps {
   searchParams: Promise<{
@@ -43,15 +44,12 @@ export default async function SectionsPage({
           </Button>
         </div>
       </div>
-      <SectionsRealtimeWrapper
-        initialSections={sections}
-        currentUserId={session?.id}
-        filters={{
-          status: params.status,
-          search: params.search,
-          sort: params.sort ?? "desc",
-        }}
+      <SectionFilters
+        currentStatus={params.status}
+        currentSearch={params.search}
+        currentSort={params.sort ?? "desc"}
       />
+      <SectionList sections={sections} currentUserId={session?.id} />
     </div>
   );
 }
