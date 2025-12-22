@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Gamepad2 } from "lucide-react";
 import { ParticipantList } from "./participant-list";
+import { SectionSummary } from "./section-summary";
 
 interface SectionListProps {
   sections: SectionListItem[];
@@ -33,7 +34,7 @@ export function SectionList({ sections, currentUserId }: SectionListProps) {
     <div className="grid gap-4 md:grid-cols-2">
       {sections.map((section) => (
         <Link key={section.id} href={`/sections/${section.id}`}>
-          <Card className="h-full overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50">
+          <Card className="h-full overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/50 gap-2">
             <CardHeader>
               <div className="flex items-start justify-between gap-2">
                 <CardTitle className="text-xl font-bold leading-tight transition-colors">
@@ -61,11 +62,17 @@ export function SectionList({ sections, currentUserId }: SectionListProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <ParticipantList participants={section.participants} />
-              <div className="flex items-center justify-between pt-2 border-t">
+              {/* <ParticipantList participants={section.participants} /> */}
+              <SectionSummary
+                games={section.games!}
+                participants={section.participants}
+                returnPoints={section.returnPoints}
+                rate={section.rate}
+              />
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-sm font-medium">
                   <Gamepad2 className="h-4 w-4 text-primary" />
-                  <span>{section.gameCount}ゲーム</span>
+                  <span>{section.games ? section.games.length : 0}ゲーム</span>
                 </div>
                 <div className="flex gap-3 text-xs text-muted-foreground">
                   <span>開始: {section.startingPoints.toLocaleString()}点</span>

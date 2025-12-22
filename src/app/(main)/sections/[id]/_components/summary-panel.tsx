@@ -29,63 +29,68 @@ interface PlayerSummary {
   rank: number;
 }
 
+// 各プレイヤーの集計を計算
+export function calculateSummary(
+  games: GameWithScores[],
+  participants: SectionParticipant[],
+  returnPoints: number,
+  rate: number
+): PlayerSummary[] {
+  const summaries: PlayerSummary[] = participants.map((participant) => {
+    // 全ゲームの点数合計
+    const totalPoints = games.reduce((sum, game) => {
+      const score = game.scores.find((s) => s.userId === participant.userId);
+      return sum + (score?.points ?? 0);
+    }, 0);
+
+    // 返し点からの増減（ゲーム数 × 返し点 との差分）
+    const expectedPoints = games.length * returnPoints;
+    const pointDiff = totalPoints - expectedPoints;
+
+    // 精算額の計算（1000点単位でレート換算）
+    const settlement = (pointDiff / 1000) * rate;
+
+    return {
+      userId: participant.userId,
+      displayName: participant.displayName,
+      totalPoints,
+      pointDiff,
+      settlement,
+      rank: 0, // 後で計算
+    };
+  });
+
+  // 順位を計算（totalPointsで降順ソート）
+  const sortedByPoints = [...summaries].sort(
+    (a, b) => b.totalPoints - a.totalPoints
+  );
+
+  sortedByPoints.forEach((summary, index) => {
+    // 同点の場合は同じ順位
+    if (
+      index > 0 &&
+      summary.totalPoints === sortedByPoints[index - 1].totalPoints
+    ) {
+      summary.rank = sortedByPoints[index - 1].rank;
+    } else {
+      summary.rank = index + 1;
+    }
+  });
+
+  // 元の順序（参加者順）で返す
+  return summaries.map((s) => ({
+    ...s,
+    rank: sortedByPoints.find((sp) => sp.userId === s.userId)?.rank ?? 0,
+  }));
+}
+
 export function SummaryPanel({
   games,
   participants,
   returnPoints,
   rate,
 }: SummaryPanelProps) {
-  // 各プレイヤーの集計を計算
-  const calculateSummary = (): PlayerSummary[] => {
-    const summaries: PlayerSummary[] = participants.map((participant) => {
-      // 全ゲームの点数合計
-      const totalPoints = games.reduce((sum, game) => {
-        const score = game.scores.find((s) => s.userId === participant.userId);
-        return sum + (score?.points ?? 0);
-      }, 0);
-
-      // 返し点からの増減（ゲーム数 × 返し点 との差分）
-      const expectedPoints = games.length * returnPoints;
-      const pointDiff = totalPoints - expectedPoints;
-
-      // 精算額の計算（1000点単位でレート換算）
-      const settlement = (pointDiff / 1000) * rate;
-
-      return {
-        userId: participant.userId,
-        displayName: participant.displayName,
-        totalPoints,
-        pointDiff,
-        settlement,
-        rank: 0, // 後で計算
-      };
-    });
-
-    // 順位を計算（totalPointsで降順ソート）
-    const sortedByPoints = [...summaries].sort(
-      (a, b) => b.totalPoints - a.totalPoints
-    );
-
-    sortedByPoints.forEach((summary, index) => {
-      // 同点の場合は同じ順位
-      if (
-        index > 0 &&
-        summary.totalPoints === sortedByPoints[index - 1].totalPoints
-      ) {
-        summary.rank = sortedByPoints[index - 1].rank;
-      } else {
-        summary.rank = index + 1;
-      }
-    });
-
-    // 元の順序（参加者順）で返す
-    return summaries.map((s) => ({
-      ...s,
-      rank: sortedByPoints.find((sp) => sp.userId === s.userId)?.rank ?? 0,
-    }));
-  };
-
-  const summaries = calculateSummary();
+  const summaries = calculateSummary(games, participants, returnPoints, rate);
 
   const formatPoints = (points: number): string => {
     const prefix = points > 0 ? "+" : "";

@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { Tables, Enums } from "@/lib/supabase/database.types";
+import { GameWithScores } from "./games";
 
 export type SectionStatus = Enums<"section_status">;
 export type SectionRow = Tables<"sections">;
@@ -24,7 +25,8 @@ export interface SectionListItem {
   createdAt: string;
   closedAt: string | null;
   participants: SectionParticipant[];
-  gameCount: number;
+  gameCount?: number;
+  games?: GameWithScores[];
 }
 
 export interface GetSectionsOptions {
@@ -37,7 +39,7 @@ export interface GetSectionsOptions {
  * セクション一覧を取得する
  */
 export async function getSections(
-  options: GetSectionsOptions = {},
+  options: GetSectionsOptions = {}
 ): Promise<SectionListItem[]> {
   const supabase = createAdminClient();
   const { status, search, sortOrder = "desc" } = options;
@@ -63,8 +65,21 @@ export async function getSections(
         user_id,
         user:users(display_name)
       ),
-      games(count)
-    `,
+      games(
+        id,
+        game_number,
+        section_id,
+        created_at,
+        updated_at,
+        scores(
+          id,
+          game_id,
+          user_id,
+          points,
+          user:users(display_name)
+        )
+      )
+    `
     )
     .order("created_at", { ascending: sortOrder === "asc" });
 
@@ -112,7 +127,28 @@ export async function getSections(
       userId: p.user_id,
       displayName: p.user?.display_name ?? "不明",
     })),
-    gameCount: (section.games as Array<{ count: number }>)[0]?.count ?? 0,
+    games: section.games.map((game) => ({
+      id: game.id,
+      gameNumber: game.game_number,
+      sectionId: game.section_id,
+      createdAt: game.created_at,
+      updatedAt: game.updated_at,
+      scores: (
+        game.scores as Array<{
+          id: string;
+          game_id: string;
+          user_id: string;
+          points: number;
+          user: { display_name: string } | null;
+        }>
+      ).map((score) => ({
+        id: score.id,
+        gameId: score.game_id,
+        userId: score.user_id,
+        displayName: score.user?.display_name ?? "不明",
+        points: score.points,
+      })),
+    })),
   }));
 }
 
@@ -143,7 +179,7 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
         user:users(display_name)
       ),
       games(count)
-    `,
+    `
     )
     .eq("id", id)
     .is("deleted_at", null)
@@ -189,7 +225,7 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
  */
 export async function isUserParticipant(
   sectionId: string,
-  userId: string,
+  userId: string
 ): Promise<boolean> {
   const supabase = createAdminClient();
 
@@ -215,7 +251,7 @@ export async function isUserParticipant(
  */
 export async function isSectionCreator(
   sectionId: string,
-  userId: string,
+  userId: string
 ): Promise<boolean> {
   const supabase = createAdminClient();
 
