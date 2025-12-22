@@ -32,7 +32,6 @@ interface PlayerSummary {
 export function SummaryPanel({
   games,
   participants,
-  startingPoints,
   returnPoints,
   rate,
 }: SummaryPanelProps) {
@@ -64,7 +63,7 @@ export function SummaryPanel({
 
     // 順位を計算（totalPointsで降順ソート）
     const sortedByPoints = [...summaries].sort(
-      (a, b) => b.totalPoints - a.totalPoints,
+      (a, b) => b.totalPoints - a.totalPoints
     );
 
     sortedByPoints.forEach((summary, index) => {
@@ -99,7 +98,7 @@ export function SummaryPanel({
   };
 
   const getRankBadgeVariant = (
-    rank: number,
+    rank: number
   ): "default" | "secondary" | "outline" => {
     switch (rank) {
       case 1:
@@ -157,8 +156,8 @@ export function SummaryPanel({
                       summary.pointDiff < 0
                         ? "text-red-600"
                         : summary.pointDiff > 0
-                          ? "text-green-600"
-                          : ""
+                        ? "text-green-600"
+                        : ""
                     }`}
                   >
                     {formatPoints(summary.pointDiff)}
@@ -169,8 +168,8 @@ export function SummaryPanel({
                         summary.settlement < 0
                           ? "text-red-600"
                           : summary.settlement > 0
-                            ? "text-green-600"
-                            : ""
+                          ? "text-green-600"
+                          : ""
                       }`}
                     >
                       {formatCurrency(summary.settlement)}

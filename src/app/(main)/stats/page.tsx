@@ -1,12 +1,6 @@
 import { Suspense } from "react";
 import { PageHeader } from "@/components/common/page-header";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getSession } from "@/lib/auth/session";
 import { getStats, DateRange } from "@/lib/db/queries/stats";

@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { StatsResult } from "@/lib/db/queries/stats";
 
 interface StatsCardsProps {
@@ -84,8 +77,8 @@ export function StatsCards({ stats, currentUserId }: StatsCardsProps) {
               currentUserStats.totalSettlement < 0
                 ? "text-red-600"
                 : currentUserStats.totalSettlement > 0
-                  ? "text-green-600"
-                  : ""
+                ? "text-green-600"
+                : ""
             }
           >
             {formatCurrency(currentUserStats.totalSettlement)}

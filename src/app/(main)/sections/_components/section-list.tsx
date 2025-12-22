@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, Gamepad2 } from "lucide-react";
+import { Calendar, Gamepad2 } from "lucide-react";
 import { ParticipantList } from "./participant-list";
 
 interface SectionListProps {

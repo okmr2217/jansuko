@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SectionListItem } from "@/lib/db/queries/sections";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,24 +43,13 @@ export function SectionEditDialog({
 }: SectionEditDialogProps) {
   const [name, setName] = useState(section.name);
   const [startingPoints, setStartingPoints] = useState(
-    String(section.startingPoints),
+    String(section.startingPoints)
   );
   const [returnPoints, setReturnPoints] = useState(
-    String(section.returnPoints),
+    String(section.returnPoints)
   );
   const [rate, setRate] = useState(String(section.rate));
   const [error, setError] = useState<string | null>(null);
-
-  // ダイアログが開いたときに値をリセット
-  useEffect(() => {
-    if (open) {
-      setName(section.name);
-      setStartingPoints(String(section.startingPoints));
-      setReturnPoints(String(section.returnPoints));
-      setRate(String(section.rate));
-      setError(null);
-    }
-  }, [open, section]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
