@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 const SESSION_COOKIE_NAME = "session";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30日間
+const SESSION_MAX_AGE = 60 * 60 * 24 * 90; // 90日間
 
 export interface SessionUser {
   id: string;
