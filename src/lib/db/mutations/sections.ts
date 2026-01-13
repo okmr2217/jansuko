@@ -1,5 +1,5 @@
-import { createAdminClient } from "@/lib/supabase/server";
-import { TablesInsert, TablesUpdate } from "@/lib/supabase/database.types";
+import { prisma } from "@/lib/db/prisma";
+import { Prisma } from "@/generated/prisma/client";
 
 export interface CreateSectionInput {
   name: string;
@@ -24,46 +24,30 @@ export interface UpdateSectionInput {
 export async function createSection(
   input: CreateSectionInput,
 ): Promise<string> {
-  const supabase = createAdminClient();
+  return prisma.$transaction(async (tx) => {
+    // セクションを作成
+    const section = await tx.section.create({
+      data: {
+        name: input.name,
+        startingPoints: input.startingPoints ?? 25000,
+        returnPoints: input.returnPoints ?? 30000,
+        rate: input.rate ?? 50,
+        playerCount: input.playerCount,
+        createdBy: input.createdBy,
+      },
+      select: { id: true },
+    });
 
-  // セクションを作成
-  const sectionData: TablesInsert<"sections"> = {
-    name: input.name,
-    starting_points: input.startingPoints ?? 25000,
-    return_points: input.returnPoints ?? 30000,
-    rate: input.rate ?? 50,
-    player_count: input.playerCount,
-    created_by: input.createdBy,
-  };
+    // 参加者を追加
+    await tx.sectionParticipant.createMany({
+      data: input.participantIds.map((userId) => ({
+        sectionId: section.id,
+        userId,
+      })),
+    });
 
-  const { data: section, error: sectionError } = await supabase
-    .from("sections")
-    .insert(sectionData)
-    .select("id")
-    .single();
-
-  if (sectionError) {
-    throw new Error(`セクションの作成に失敗しました: ${sectionError.message}`);
-  }
-
-  // 参加者を追加
-  const participantsData: TablesInsert<"section_participants">[] =
-    input.participantIds.map((userId) => ({
-      section_id: section.id,
-      user_id: userId,
-    }));
-
-  const { error: participantsError } = await supabase
-    .from("section_participants")
-    .insert(participantsData);
-
-  if (participantsError) {
-    // セクションを削除してロールバック
-    await supabase.from("sections").delete().eq("id", section.id);
-    throw new Error(`参加者の追加に失敗しました: ${participantsError.message}`);
-  }
-
-  return section.id;
+    return section.id;
+  });
 }
 
 /**
@@ -73,20 +57,18 @@ export async function updateSection(
   id: string,
   input: UpdateSectionInput,
 ): Promise<void> {
-  const supabase = createAdminClient();
-
-  const updateData: TablesUpdate<"sections"> = {};
+  const updateData: Prisma.SectionUpdateInput = {};
 
   if (input.name !== undefined) {
     updateData.name = input.name;
   }
 
   if (input.startingPoints !== undefined) {
-    updateData.starting_points = input.startingPoints;
+    updateData.startingPoints = input.startingPoints;
   }
 
   if (input.returnPoints !== undefined) {
-    updateData.return_points = input.returnPoints;
+    updateData.returnPoints = input.returnPoints;
   }
 
   if (input.rate !== undefined) {
@@ -97,72 +79,44 @@ export async function updateSection(
     return;
   }
 
-  const { error } = await supabase
-    .from("sections")
-    .update(updateData)
-    .eq("id", id);
-
-  if (error) {
-    throw new Error(`セクションの更新に失敗しました: ${error.message}`);
-  }
+  await prisma.section.update({
+    where: { id },
+    data: updateData,
+  });
 }
 
 /**
  * セクションを終了する（クローズする）
  */
 export async function closeSection(id: string): Promise<void> {
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("sections")
-    .update({
+  await prisma.section.update({
+    where: { id },
+    data: {
       status: "closed",
-      closed_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .eq("status", "active");
-
-  if (error) {
-    throw new Error(`セクションの終了に失敗しました: ${error.message}`);
-  }
+      closedAt: new Date(),
+    },
+  });
 }
 
 /**
  * セクションを削除する（論理削除）
  */
 export async function deleteSection(id: string): Promise<void> {
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("sections")
-    .update({
-      deleted_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .is("deleted_at", null);
-
-  if (error) {
-    throw new Error(`セクションの削除に失敗しました: ${error.message}`);
-  }
+  await prisma.section.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+  });
 }
 
 /**
  * セクションを再開する（終了→進行中に戻す）
  */
 export async function reopenSection(id: string): Promise<void> {
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("sections")
-    .update({
+  await prisma.section.update({
+    where: { id },
+    data: {
       status: "active",
-      closed_at: null,
-    })
-    .eq("id", id)
-    .eq("status", "closed")
-    .is("deleted_at", null);
-
-  if (error) {
-    throw new Error(`セクションの再開に失敗しました: ${error.message}`);
-  }
+      closedAt: null,
+    },
+  });
 }

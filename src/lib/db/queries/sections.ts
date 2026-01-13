@@ -1,10 +1,8 @@
-import { createAdminClient } from "@/lib/supabase/server";
-import { Tables, Enums } from "@/lib/supabase/database.types";
+import { prisma } from "@/lib/db/prisma";
+import { SectionStatus } from "@/generated/prisma/client";
 import { GameWithScores } from "./games";
 
-export type SectionStatus = Enums<"section_status">;
-export type SectionRow = Tables<"sections">;
-export type SectionParticipantRow = Tables<"section_participants">;
+export type { SectionStatus };
 
 export interface SectionParticipant {
   id: string;
@@ -22,8 +20,8 @@ export interface SectionListItem {
   status: SectionStatus;
   createdBy: string | null;
   createdByName: string | null;
-  createdAt: string;
-  closedAt: string | null;
+  createdAt: Date;
+  closedAt: Date | null;
   participants: SectionParticipant[];
   gameCount?: number;
   games?: GameWithScores[];
@@ -39,113 +37,71 @@ export interface GetSectionsOptions {
  * セクション一覧を取得する
  */
 export async function getSections(
-  options: GetSectionsOptions = {}
+  options: GetSectionsOptions = {},
 ): Promise<SectionListItem[]> {
-  const supabase = createAdminClient();
   const { status, search, sortOrder = "desc" } = options;
 
-  // セクション基本情報を取得
-  let query = supabase
-    .from("sections")
-    .select(
-      `
-      id,
-      name,
-      starting_points,
-      return_points,
-      rate,
-      player_count,
-      status,
-      created_by,
-      created_at,
-      closed_at,
-      creator:users!sections_created_by_fkey(display_name),
-      section_participants(
-        id,
-        user_id,
-        user:users(display_name)
-      ),
-      games(
-        id,
-        game_number,
-        section_id,
-        created_at,
-        updated_at,
-        scores(
-          id,
-          game_id,
-          user_id,
-          points,
-          user:users(display_name)
-        )
-      )
-    `
-    )
-    .order("created_at", { ascending: sortOrder === "asc" });
+  const sections = await prisma.section.findMany({
+    where: {
+      deletedAt: null,
+      ...(status && { status }),
+      ...(search && { name: { contains: search, mode: "insensitive" } }),
+    },
+    orderBy: { createdAt: sortOrder },
+    include: {
+      creator: {
+        select: { displayName: true },
+      },
+      participants: {
+        include: {
+          user: {
+            select: { displayName: true },
+          },
+        },
+      },
+      games: {
+        orderBy: { gameNumber: "asc" },
+        include: {
+          scores: {
+            include: {
+              user: {
+                select: { displayName: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 
-  // 論理削除されていないセクションのみ取得
-  query = query.is("deleted_at", null);
-
-  // ステータスフィルター
-  if (status) {
-    query = query.eq("status", status);
-  }
-
-  // 検索フィルター（セクション名）
-  if (search) {
-    query = query.ilike("name", `%${search}%`);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(`セクション一覧の取得に失敗しました: ${error.message}`);
-  }
-
-  return data.map((section) => ({
+  return sections.map((section) => ({
     id: section.id,
     name: section.name,
-    startingPoints: section.starting_points,
-    returnPoints: section.return_points,
+    startingPoints: section.startingPoints,
+    returnPoints: section.returnPoints,
     rate: section.rate,
-    playerCount: section.player_count,
+    playerCount: section.playerCount,
     status: section.status,
-    createdBy: section.created_by,
-    createdByName:
-      (section.creator as { display_name: string } | null)?.display_name ??
-      null,
-    createdAt: section.created_at,
-    closedAt: section.closed_at,
-    participants: (
-      section.section_participants as Array<{
-        id: string;
-        user_id: string;
-        user: { display_name: string } | null;
-      }>
-    ).map((p) => ({
+    createdBy: section.createdBy,
+    createdByName: section.creator?.displayName ?? null,
+    createdAt: section.createdAt,
+    closedAt: section.closedAt,
+    participants: section.participants.map((p) => ({
       id: p.id,
-      userId: p.user_id,
-      displayName: p.user?.display_name ?? "不明",
+      userId: p.userId,
+      displayName: p.user?.displayName ?? "不明",
     })),
     games: section.games.map((game) => ({
       id: game.id,
-      gameNumber: game.game_number,
-      sectionId: game.section_id,
-      createdAt: game.created_at,
-      updatedAt: game.updated_at,
-      scores: (
-        game.scores as Array<{
-          id: string;
-          game_id: string;
-          user_id: string;
-          points: number;
-          user: { display_name: string } | null;
-        }>
-      ).map((score) => ({
+      gameNumber: game.gameNumber,
+      sectionId: game.sectionId,
+      createdAt: game.createdAt,
+      updatedAt: game.updatedAt,
+      scores: game.scores.map((score) => ({
         id: score.id,
-        gameId: score.game_id,
-        userId: score.user_id,
-        displayName: score.user?.display_name ?? "不明",
+        gameId: score.gameId,
+        userId: score.userId,
+        displayName: score.user?.displayName ?? "不明",
         points: score.points,
       })),
     })),
@@ -156,67 +112,47 @@ export async function getSections(
  * 特定のセクションを取得する
  */
 export async function getSection(id: string): Promise<SectionListItem | null> {
-  const supabase = createAdminClient();
+  const section = await prisma.section.findFirst({
+    where: { id, deletedAt: null },
+    include: {
+      creator: {
+        select: { displayName: true },
+      },
+      participants: {
+        include: {
+          user: {
+            select: { displayName: true },
+          },
+        },
+      },
+      _count: {
+        select: { games: true },
+      },
+    },
+  });
 
-  const { data, error } = await supabase
-    .from("sections")
-    .select(
-      `
-      id,
-      name,
-      starting_points,
-      return_points,
-      rate,
-      player_count,
-      status,
-      created_by,
-      created_at,
-      closed_at,
-      creator:users!sections_created_by_fkey(display_name),
-      section_participants(
-        id,
-        user_id,
-        user:users(display_name)
-      ),
-      games(count)
-    `
-    )
-    .eq("id", id)
-    .is("deleted_at", null)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return null;
-    }
-    throw new Error(`セクションの取得に失敗しました: ${error.message}`);
+  if (!section) {
+    return null;
   }
 
   return {
-    id: data.id,
-    name: data.name,
-    startingPoints: data.starting_points,
-    returnPoints: data.return_points,
-    rate: data.rate,
-    playerCount: data.player_count,
-    status: data.status,
-    createdBy: data.created_by,
-    createdByName:
-      (data.creator as { display_name: string } | null)?.display_name ?? null,
-    createdAt: data.created_at,
-    closedAt: data.closed_at,
-    participants: (
-      data.section_participants as Array<{
-        id: string;
-        user_id: string;
-        user: { display_name: string } | null;
-      }>
-    ).map((p) => ({
+    id: section.id,
+    name: section.name,
+    startingPoints: section.startingPoints,
+    returnPoints: section.returnPoints,
+    rate: section.rate,
+    playerCount: section.playerCount,
+    status: section.status,
+    createdBy: section.createdBy,
+    createdByName: section.creator?.displayName ?? null,
+    createdAt: section.createdAt,
+    closedAt: section.closedAt,
+    participants: section.participants.map((p) => ({
       id: p.id,
-      userId: p.user_id,
-      displayName: p.user?.display_name ?? "不明",
+      userId: p.userId,
+      displayName: p.user?.displayName ?? "不明",
     })),
-    gameCount: (data.games as Array<{ count: number }>)[0]?.count ?? 0,
+    gameCount: section._count.games,
   };
 }
 
@@ -225,25 +161,16 @@ export async function getSection(id: string): Promise<SectionListItem | null> {
  */
 export async function isUserParticipant(
   sectionId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
-  const supabase = createAdminClient();
+  const participant = await prisma.sectionParticipant.findUnique({
+    where: {
+      sectionId_userId: { sectionId, userId },
+    },
+    select: { id: true },
+  });
 
-  const { data, error } = await supabase
-    .from("section_participants")
-    .select("id")
-    .eq("section_id", sectionId)
-    .eq("user_id", userId)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return false;
-    }
-    throw new Error(`参加者の確認に失敗しました: ${error.message}`);
-  }
-
-  return !!data;
+  return !!participant;
 }
 
 /**
@@ -251,23 +178,12 @@ export async function isUserParticipant(
  */
 export async function isSectionCreator(
   sectionId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
-  const supabase = createAdminClient();
+  const section = await prisma.section.findFirst({
+    where: { id: sectionId, deletedAt: null },
+    select: { createdBy: true },
+  });
 
-  const { data, error } = await supabase
-    .from("sections")
-    .select("created_by")
-    .eq("id", sectionId)
-    .is("deleted_at", null)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return false;
-    }
-    throw new Error(`作成者の確認に失敗しました: ${error.message}`);
-  }
-
-  return data.created_by === userId;
+  return section?.createdBy === userId;
 }

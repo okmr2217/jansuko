@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SectionStatus {
+  active
+  closed
+}
+
+model User {
+  id           String    @id @default(uuid())
+  displayName  String    @map("display_name")
+  passwordHash String    @map("password_hash")
+  isAdmin      Boolean   @default(false) @map("is_admin")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  createdSections       Section[]            @relation("SectionCreator")
+  sectionParticipations SectionParticipant[]
+  scores                Score[]
+
+  @@map("users")
+}
+
+model Section {
+  id             String        @id @default(uuid())
+  name           String
+  startingPoints Int           @default(25000) @map("starting_points")
+  returnPoints   Int           @default(30000) @map("return_points")
+  rate           Int           @default(50)
+  playerCount    Int           @map("player_count")
+  status         SectionStatus @default(active)
+  createdBy      String?       @map("created_by")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  closedAt       DateTime?     @map("closed_at")
+  deletedAt      DateTime?     @map("deleted_at")
+
+  creator      User?                @relation("SectionCreator", fields: [createdBy], references: [id])
+  participants SectionParticipant[]
+  games        Game[]
+
+  @@map("sections")
+}
+
+model SectionParticipant {
+  id        String   @id @default(uuid())
+  sectionId String   @map("section_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([sectionId, userId])
+  @@map("section_participants")
+}
+
+model Game {
+  id         String   @id @default(uuid())
+  sectionId  String   @map("section_id")
+  gameNumber Int      @map("game_number")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  scores  Score[]
+
+  @@unique([sectionId, gameNumber])
+  @@map("games")
+}
+
+model Score {
+  id        String   @id @default(uuid())
+  gameId    String   @map("game_id")
+  userId    String   @map("user_id")
+  points    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([gameId, userId])
+  @@map("scores")
+}

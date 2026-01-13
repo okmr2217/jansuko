@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
 import { loginSchema } from "@/lib/validations/auth";
@@ -27,22 +27,26 @@ export async function login(
 
   const { displayName, password } = result.data;
 
-  const supabase = createAdminClient();
-
   // ユーザーを表示名で検索（削除されていないユーザーのみ）
-  const { data: user, error } = await supabase
-    .from("users")
-    .select("id, display_name, password_hash, is_admin")
-    .eq("display_name", displayName)
-    .is("deleted_at", null)
-    .single();
+  const user = await prisma.user.findFirst({
+    where: {
+      displayName,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      displayName: true,
+      passwordHash: true,
+      isAdmin: true,
+    },
+  });
 
-  if (error || !user) {
+  if (!user) {
     return { error: "表示名またはパスワードが正しくありません" };
   }
 
   // パスワードを検証
-  const isValid = await verifyPassword(password, user.password_hash);
+  const isValid = await verifyPassword(password, user.passwordHash);
   if (!isValid) {
     return { error: "表示名またはパスワードが正しくありません" };
   }
@@ -50,8 +54,8 @@ export async function login(
   // セッションを作成
   await createSession({
     id: user.id,
-    displayName: user.display_name,
-    isAdmin: user.is_admin,
+    displayName: user.displayName,
+    isAdmin: user.isAdmin,
   });
 
   redirect("/");

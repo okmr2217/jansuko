@@ -199,7 +199,7 @@ export function SectionDetailClient({
         setCurrentSection((prev) => ({
           ...prev,
           status: "closed" as const,
-          closedAt: new Date().toISOString(),
+          closedAt: new Date(),
         }));
         router.refresh();
       } else {

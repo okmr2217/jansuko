@@ -8,6 +8,8 @@ import {
 import { getUsers } from "@/lib/db/queries/users";
 import { LoginForm } from "./login-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function LoginPage() {
   const users = await getUsers();
 

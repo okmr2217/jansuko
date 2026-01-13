@@ -1,5 +1,6 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
 import { hashPassword } from "@/lib/auth/password";
+import { Prisma } from "@/generated/prisma/client";
 
 export interface CreateUserInput {
   displayName: string;
@@ -17,28 +18,27 @@ export interface UpdateUserInput {
  * 新しいユーザーを作成する
  */
 export async function createUser(input: CreateUserInput): Promise<string> {
-  const supabase = createAdminClient();
-
   const passwordHash = await hashPassword(input.password);
 
-  const { data, error } = await supabase
-    .from("users")
-    .insert({
-      display_name: input.displayName,
-      password_hash: passwordHash,
-      is_admin: input.isAdmin ?? false,
-    })
-    .select("id")
-    .single();
+  try {
+    const user = await prisma.user.create({
+      data: {
+        displayName: input.displayName,
+        passwordHash,
+        isAdmin: input.isAdmin ?? false,
+      },
+      select: { id: true },
+    });
 
-  if (error) {
-    if (error.code === "23505") {
-      throw new Error("この表示名は既に使用されています");
+    return user.id;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        throw new Error("この表示名は既に使用されています");
+      }
     }
-    throw new Error(`ユーザーの作成に失敗しました: ${error.message}`);
+    throw new Error("ユーザーの作成に失敗しました");
   }
-
-  return data.id;
 }
 
 /**
@@ -48,37 +48,36 @@ export async function updateUser(
   id: string,
   input: UpdateUserInput,
 ): Promise<void> {
-  const supabase = createAdminClient();
-
-  const updateData: Record<string, unknown> = {};
+  const updateData: Prisma.UserUpdateInput = {};
 
   if (input.displayName !== undefined) {
-    updateData.display_name = input.displayName;
+    updateData.displayName = input.displayName;
   }
 
   if (input.password !== undefined) {
-    updateData.password_hash = await hashPassword(input.password);
+    updateData.passwordHash = await hashPassword(input.password);
   }
 
   if (input.isAdmin !== undefined) {
-    updateData.is_admin = input.isAdmin;
+    updateData.isAdmin = input.isAdmin;
   }
 
   if (Object.keys(updateData).length === 0) {
     return;
   }
 
-  const { error } = await supabase
-    .from("users")
-    .update(updateData)
-    .eq("id", id)
-    .is("deleted_at", null);
-
-  if (error) {
-    if (error.code === "23505") {
-      throw new Error("この表示名は既に使用されています");
+  try {
+    await prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        throw new Error("この表示名は既に使用されています");
+      }
     }
-    throw new Error(`ユーザーの更新に失敗しました: ${error.message}`);
+    throw new Error("ユーザーの更新に失敗しました");
   }
 }
 
@@ -86,15 +85,8 @@ export async function updateUser(
  * ユーザーを論理削除する
  */
 export async function deleteUser(id: string): Promise<void> {
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("users")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", id)
-    .is("deleted_at", null);
-
-  if (error) {
-    throw new Error(`ユーザーの削除に失敗しました: ${error.message}`);
-  }
+  await prisma.user.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+  });
 }

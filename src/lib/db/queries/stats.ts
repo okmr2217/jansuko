@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
 
 export interface DateRange {
   from?: string; // ISO string (YYYY-MM-DD)
@@ -32,50 +32,35 @@ export interface StatsResult {
  * 期間を指定して全ユーザーの統計を取得する
  */
 export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
-  const supabase = createAdminClient();
-
   // 終了したセクションのみを対象とする
-  let sectionsQuery = supabase
-    .from("sections")
-    .select(
-      `
-      id,
-      starting_points,
-      return_points,
-      rate,
-      player_count,
-      closed_at,
-      section_participants(
-        user_id,
-        user:users(id, display_name)
-      ),
-      games(
-        id,
-        scores(
-          user_id,
-          points
-        )
-      )
-    `
-    )
-    .eq("status", "closed");
-
-  // 期間フィルター
-  if (dateRange?.from) {
-    sectionsQuery = sectionsQuery.gte("created_at", dateRange.from);
-  }
-  if (dateRange?.to) {
-    // toの日付の翌日の0時までを含める
-    const toDate = new Date(dateRange.to);
+  const toDate = dateRange?.to ? new Date(dateRange.to) : undefined;
+  if (toDate) {
     toDate.setDate(toDate.getDate() + 1);
-    sectionsQuery = sectionsQuery.lt("created_at", toDate.toISOString());
   }
 
-  const { data: sections, error } = await sectionsQuery;
-
-  if (error) {
-    throw new Error(`統計データの取得に失敗しました: ${error.message}`);
-  }
+  const sections = await prisma.section.findMany({
+    where: {
+      status: "closed",
+      ...(dateRange?.from && { createdAt: { gte: new Date(dateRange.from) } }),
+      ...(toDate && { createdAt: { lt: toDate } }),
+    },
+    include: {
+      participants: {
+        include: {
+          user: {
+            select: { id: true, displayName: true },
+          },
+        },
+      },
+      games: {
+        include: {
+          scores: {
+            select: { userId: true, points: true },
+          },
+        },
+      },
+    },
+  });
 
   // ユーザーごとの統計を集計
   const userStatsMap = new Map<
@@ -93,31 +78,21 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
   for (const section of sections) {
     sectionIds.add(section.id);
 
-    const games = section.games as Array<{
-      id: string;
-      scores: Array<{ user_id: string; points: number }>;
-    }>;
-
-    const participants = section.section_participants as Array<{
-      user_id: string;
-      user: { id: string; display_name: string } | null;
-    }>;
-
     // 参加者をマップに追加
-    for (const participant of participants) {
+    for (const participant of section.participants) {
       if (!participant.user) continue;
-      if (!userStatsMap.has(participant.user_id)) {
-        userStatsMap.set(participant.user_id, {
-          displayName: participant.user.display_name,
+      if (!userStatsMap.has(participant.userId)) {
+        userStatsMap.set(participant.userId, {
+          displayName: participant.user.displayName,
           games: [],
           sectionIds: new Set(),
         });
       }
-      userStatsMap.get(participant.user_id)!.sectionIds.add(section.id);
+      userStatsMap.get(participant.userId)!.sectionIds.add(section.id);
     }
 
     // 各ゲームの処理
-    for (const game of games) {
+    for (const game of section.games) {
       totalGames++;
 
       // スコアを点数順にソートして順位を決定
@@ -130,25 +105,25 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
         if (i > 0 && sortedScores[i].points === sortedScores[i - 1].points) {
           // 同点の場合は同じ順位
           rankMap.set(
-            sortedScores[i].user_id,
-            rankMap.get(sortedScores[i - 1].user_id)!
+            sortedScores[i].userId,
+            rankMap.get(sortedScores[i - 1].userId)!,
           );
         } else {
-          rankMap.set(sortedScores[i].user_id, currentRank);
+          rankMap.set(sortedScores[i].userId, currentRank);
         }
         currentRank++;
       }
 
       // 各プレイヤーのゲーム結果を記録
       for (const score of game.scores) {
-        const userData = userStatsMap.get(score.user_id);
+        const userData = userStatsMap.get(score.userId);
         if (!userData) continue;
 
-        const rank = rankMap.get(score.user_id) ?? 0;
+        const rank = rankMap.get(score.userId) ?? 0;
 
         // 精算額の計算
         // 返し点からの増減を計算
-        const pointDiff = score.points - section.return_points;
+        const pointDiff = score.points - section.returnPoints;
         const settlement = (pointDiff / 1000) * section.rate;
 
         userData.games.push({ rank, settlement });
@@ -182,7 +157,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
 
     const totalSettlement = userData.games.reduce(
       (sum, g) => sum + g.settlement,
-      0
+      0,
     );
 
     users.push({
@@ -213,7 +188,7 @@ export async function getStats(dateRange?: DateRange): Promise<StatsResult> {
  */
 export async function getUserStats(
   userId: string,
-  dateRange?: DateRange
+  dateRange?: DateRange,
 ): Promise<UserStats | null> {
   const result = await getStats(dateRange);
   return result.users.find((u) => u.userId === userId) ?? null;

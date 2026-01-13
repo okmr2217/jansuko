@@ -1,8 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/server";
-import { Tables } from "@/lib/supabase/database.types";
-
-export type GameRow = Tables<"games">;
-export type ScoreRow = Tables<"scores">;
+import { prisma } from "@/lib/db/prisma";
 
 export interface GameScore {
   id: string;
@@ -16,8 +12,8 @@ export interface GameWithScores {
   id: string;
   gameNumber: number;
   sectionId: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   scores: GameScore[];
 }
 
@@ -27,52 +23,31 @@ export interface GameWithScores {
 export async function getGamesWithScores(
   sectionId: string,
 ): Promise<GameWithScores[]> {
-  const supabase = createAdminClient();
+  const games = await prisma.game.findMany({
+    where: { sectionId },
+    orderBy: { gameNumber: "asc" },
+    include: {
+      scores: {
+        include: {
+          user: {
+            select: { displayName: true },
+          },
+        },
+      },
+    },
+  });
 
-  const { data, error } = await supabase
-    .from("games")
-    .select(
-      `
-      id,
-      game_number,
-      section_id,
-      created_at,
-      updated_at,
-      scores(
-        id,
-        game_id,
-        user_id,
-        points,
-        user:users(display_name)
-      )
-    `,
-    )
-    .eq("section_id", sectionId)
-    .order("game_number", { ascending: true });
-
-  if (error) {
-    throw new Error(`ゲーム一覧の取得に失敗しました: ${error.message}`);
-  }
-
-  return data.map((game) => ({
+  return games.map((game) => ({
     id: game.id,
-    gameNumber: game.game_number,
-    sectionId: game.section_id,
-    createdAt: game.created_at,
-    updatedAt: game.updated_at,
-    scores: (
-      game.scores as Array<{
-        id: string;
-        game_id: string;
-        user_id: string;
-        points: number;
-        user: { display_name: string } | null;
-      }>
-    ).map((score) => ({
+    gameNumber: game.gameNumber,
+    sectionId: game.sectionId,
+    createdAt: game.createdAt,
+    updatedAt: game.updatedAt,
+    scores: game.scores.map((score) => ({
       id: score.id,
-      gameId: score.game_id,
-      userId: score.user_id,
-      displayName: score.user?.display_name ?? "不明",
+      gameId: score.gameId,
+      userId: score.userId,
+      displayName: score.user?.displayName ?? "不明",
       points: score.points,
     })),
   }));
@@ -84,55 +59,34 @@ export async function getGamesWithScores(
 export async function getGameWithScores(
   gameId: string,
 ): Promise<GameWithScores | null> {
-  const supabase = createAdminClient();
+  const game = await prisma.game.findUnique({
+    where: { id: gameId },
+    include: {
+      scores: {
+        include: {
+          user: {
+            select: { displayName: true },
+          },
+        },
+      },
+    },
+  });
 
-  const { data, error } = await supabase
-    .from("games")
-    .select(
-      `
-      id,
-      game_number,
-      section_id,
-      created_at,
-      updated_at,
-      scores(
-        id,
-        game_id,
-        user_id,
-        points,
-        user:users(display_name)
-      )
-    `,
-    )
-    .eq("id", gameId)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return null;
-    }
-    throw new Error(`ゲームの取得に失敗しました: ${error.message}`);
+  if (!game) {
+    return null;
   }
 
   return {
-    id: data.id,
-    gameNumber: data.game_number,
-    sectionId: data.section_id,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-    scores: (
-      data.scores as Array<{
-        id: string;
-        game_id: string;
-        user_id: string;
-        points: number;
-        user: { display_name: string } | null;
-      }>
-    ).map((score) => ({
+    id: game.id,
+    gameNumber: game.gameNumber,
+    sectionId: game.sectionId,
+    createdAt: game.createdAt,
+    updatedAt: game.updatedAt,
+    scores: game.scores.map((score) => ({
       id: score.id,
-      gameId: score.game_id,
-      userId: score.user_id,
-      displayName: score.user?.display_name ?? "不明",
+      gameId: score.gameId,
+      userId: score.userId,
+      displayName: score.user?.displayName ?? "不明",
       points: score.points,
     })),
   };
@@ -142,22 +96,11 @@ export async function getGameWithScores(
  * セクションの次のゲーム番号を取得する
  */
 export async function getNextGameNumber(sectionId: string): Promise<number> {
-  const supabase = createAdminClient();
+  const lastGame = await prisma.game.findFirst({
+    where: { sectionId },
+    orderBy: { gameNumber: "desc" },
+    select: { gameNumber: true },
+  });
 
-  const { data, error } = await supabase
-    .from("games")
-    .select("game_number")
-    .eq("section_id", sectionId)
-    .order("game_number", { ascending: false })
-    .limit(1)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return 1;
-    }
-    throw new Error(`ゲーム番号の取得に失敗しました: ${error.message}`);
-  }
-
-  return data.game_number + 1;
+  return (lastGame?.gameNumber ?? 0) + 1;
 }
