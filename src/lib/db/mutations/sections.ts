@@ -8,7 +8,7 @@ export interface CreateSectionInput {
   rate?: number;
   playerCount: number;
   participantIds: string[];
-  createdBy: string;
+  createdBy?: string;
 }
 
 export interface UpdateSectionInput {
@@ -33,7 +33,7 @@ export async function createSection(
         returnPoints: input.returnPoints ?? 30000,
         rate: input.rate ?? 50,
         playerCount: input.playerCount,
-        createdBy: input.createdBy,
+        createdBy: input.createdBy ?? null,
       },
       select: { id: true },
     });

@@ -14,6 +14,7 @@ import {
   createSectionSchema,
   updateSectionSchema,
 } from "@/lib/validations/section";
+import { prisma } from "@/lib/db/prisma";
 
 export interface ActionResult {
   success: boolean;
@@ -65,6 +66,19 @@ export async function createSectionAction(
       return {
         success: false,
         error: `参加者を${data.playerCount}人選択してください`,
+      };
+    }
+
+    // ユーザーが実際に存在するか確認（セッションの不整合を検出）
+    const userExists = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true },
+    });
+
+    if (!userExists) {
+      return {
+        success: false,
+        error: "セッションが無効です。再度ログインしてください。",
       };
     }
 
