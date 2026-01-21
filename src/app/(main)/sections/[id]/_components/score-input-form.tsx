@@ -165,7 +165,7 @@ export function ScoreInputForm({
                   id={`score-${participant.userId}`}
                   type="text"
                   inputMode="numeric"
-                  placeholder="25000"
+                  placeholder={startingPoints.toString()}
                   value={scores[participant.userId] ?? ""}
                   onChange={(e) =>
                     handleScoreChange(participant.userId, e.target.value)
