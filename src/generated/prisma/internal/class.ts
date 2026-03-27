@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.2.0",
-  "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
+  "clientVersion": "7.3.0",
+  "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
   "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum SectionStatus {\n  active\n  closed\n}\n\nmodel User {\n  id           String    @id @default(uuid())\n  displayName  String    @map(\"display_name\")\n  passwordHash String    @map(\"password_hash\")\n  isAdmin      Boolean   @default(false) @map(\"is_admin\")\n  createdAt    DateTime  @default(now()) @map(\"created_at\")\n  updatedAt    DateTime  @updatedAt @map(\"updated_at\")\n  deletedAt    DateTime? @map(\"deleted_at\")\n\n  createdSections       Section[]            @relation(\"SectionCreator\")\n  sectionParticipations SectionParticipant[]\n  scores                Score[]\n\n  @@map(\"users\")\n}\n\nmodel Section {\n  id             String        @id @default(uuid())\n  name           String\n  startingPoints Int           @default(25000) @map(\"starting_points\")\n  returnPoints   Int           @default(30000) @map(\"return_points\")\n  rate           Int           @default(50)\n  playerCount    Int           @map(\"player_count\")\n  status         SectionStatus @default(active)\n  createdBy      String?       @map(\"created_by\")\n  createdAt      DateTime      @default(now()) @map(\"created_at\")\n  closedAt       DateTime?     @map(\"closed_at\")\n  deletedAt      DateTime?     @map(\"deleted_at\")\n\n  creator      User?                @relation(\"SectionCreator\", fields: [createdBy], references: [id])\n  participants SectionParticipant[]\n  games        Game[]\n\n  @@map(\"sections\")\n}\n\nmodel SectionParticipant {\n  id        String   @id @default(uuid())\n  sectionId String   @map(\"section_id\")\n  userId    String   @map(\"user_id\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n\n  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)\n  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)\n\n  @@unique([sectionId, userId])\n  @@map(\"section_participants\")\n}\n\nmodel Game {\n  id         String   @id @default(uuid())\n  sectionId  String   @map(\"section_id\")\n  gameNumber Int      @map(\"game_number\")\n  createdAt  DateTime @default(now()) @map(\"created_at\")\n  updatedAt  DateTime @updatedAt @map(\"updated_at\")\n\n  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)\n  scores  Score[]\n\n  @@unique([sectionId, gameNumber])\n  @@map(\"games\")\n}\n\nmodel Score {\n  id        String   @id @default(uuid())\n  gameId    String   @map(\"game_id\")\n  userId    String   @map(\"user_id\")\n  points    Int\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)\n  user User @relation(fields: [userId], references: [id], onDelete: Restrict)\n\n  @@unique([gameId, userId])\n  @@map(\"scores\")\n}\n",
   "runtimeDataModel": {
@@ -37,12 +37,14 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_bg.postgresql.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_bg.postgresql.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
     return await decodeBase64AsWasm(wasm)
-  }
+  },
+
+  importName: "./query_compiler_fast_bg.js"
 }
 
 
