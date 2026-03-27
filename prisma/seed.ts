@@ -9,14 +9,13 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("🌱 シーディングを開始します...");
 
-  // 既存データを削除（開発用）
-  await prisma.score.deleteMany();
-  await prisma.game.deleteMany();
-  await prisma.sectionParticipant.deleteMany();
-  await prisma.section.deleteMany();
-  await prisma.user.deleteMany();
-
-  console.log("✓ 既存データを削除しました");
+  // 既存データがあればスキップ
+  const existingUserCount = await prisma.user.count();
+  if (existingUserCount > 0) {
+    console.log(`  ⏭️  スキップ（既存ユーザー ${existingUserCount} 件）`);
+    console.log("✨ シード完了（既存データをスキップ）");
+    return;
+  }
 
   // ユーザーを作成
   const passwordHash = await hash("password", 10);
